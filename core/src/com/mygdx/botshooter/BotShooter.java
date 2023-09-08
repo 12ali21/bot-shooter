@@ -19,14 +19,14 @@ public class BotShooter extends ApplicationAdapter {
 
 	@Override
 	public void resize(int width, int height) {
-		stage.camera.viewportWidth = 100;
-		stage.camera.viewportHeight = 100 * height/width;
+		stage.camera.viewportWidth = 64;
+		stage.camera.viewportHeight = 64f * height/width;
 		super.resize(width, height);
 	}
 
 	@Override
 	public void render () {
-		ScreenUtils.clear(0, 0, 0, 0);
+		ScreenUtils.clear(145/255f, 117/255f, 93/255f , 0);
 		stage.act();
 		stage.draw();
 	}

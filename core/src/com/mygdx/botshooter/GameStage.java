@@ -2,37 +2,33 @@ package com.mygdx.botshooter;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.botshooter.actors.Map;
+import com.mygdx.botshooter.actors.Player;
 
 public class GameStage extends Stage {
     OrthographicCamera camera;
 
-    PlayerActor player;
-    Image background;
+    Player player;
+    Map map;
+    public OrthogonalTiledMapRenderer renderer;
+
 
     public GameStage() {
-        super();
-
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
 
-        camera = new OrthographicCamera(100,100 * h/w);
-        Viewport viewport = new FitViewport(200, 200, camera);
+        camera = new OrthographicCamera(10, 10*h/w);
+        Viewport viewport = new FitViewport(10, 10, camera);
         setViewport(viewport);
 
-        player = new PlayerActor();
-        background = new Image(new Texture("badlogic.jpg"));
-        background.setX(-50);
-        background.setY(-50);
-        background.setSize(400,400);
-        addActor(background);
+        player = new Player();
+        map = new Map(camera);
+
+        addActor(map);
         addActor(player);
     }
 
@@ -40,7 +36,7 @@ public class GameStage extends Stage {
     @Override
     public void act(float delta) {
         super.act(delta);
-        camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getHeight()/2,0);
+        camera.position.set(player.getX() + player.getWidth()/2, player.getY() + player.getWidth()/2, 0);
         camera.update();
     }
 
