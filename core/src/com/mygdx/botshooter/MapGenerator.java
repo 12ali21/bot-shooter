@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapLayers;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
@@ -34,7 +35,7 @@ public class MapGenerator {
     public Texture tiles;
     public OrthographicCamera camera;
     public Renderer renderer;
-    TiledMapTileLayer mountainLayer;
+    public TiledMapTileLayer mountainLayer;
 
     public MapGenerator(int seed, int width, int height, OrthographicCamera camera) {
         this.camera = camera;
@@ -54,7 +55,6 @@ public class MapGenerator {
             }
         }
         layers.add(mountainLayer);
-
         renderer = new Renderer(map, 1/16f);
     }
 

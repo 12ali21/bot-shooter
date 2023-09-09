@@ -1,6 +1,7 @@
 package com.mygdx.botshooter;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -25,8 +26,9 @@ public class GameStage extends Stage {
         Viewport viewport = new FitViewport(10, 10, camera);
         setViewport(viewport);
 
-        player = new Player();
         map = new Map(camera);
+        player = new Player(map);
+        Gdx.input.setInputProcessor(player);
 
         addActor(map);
         addActor(player);
@@ -44,4 +46,6 @@ public class GameStage extends Stage {
     public void draw() {
         super.draw();
     }
+
+
 }
