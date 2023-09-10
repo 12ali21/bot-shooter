@@ -54,7 +54,7 @@ public class MapGenerator {
         layers.add(groundLayer);
         layers.add(mountainLayer);
 
-        renderer = new Renderer(map, 1f/TILE_SIZE, camera);
+        renderer = new Renderer(map, 1, camera);
     }
 
     public void render(){

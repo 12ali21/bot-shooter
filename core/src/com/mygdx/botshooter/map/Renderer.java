@@ -43,8 +43,8 @@ class Renderer {
     public void render(){
 
         int counter = 0;
-        Frustum frustum = camera.frustum;
-        MapLayer ground = map.getLayers().get(GROUND_LAYER);
+//        Frustum frustum = camera.frustum;
+//        MapLayer ground = map.getLayers().get(GROUND_LAYER);
         TiledMapTileLayer mountain = (TiledMapTileLayer) map.getLayers().get(MOUNTAIN_LAYER);
         TiledMapTileLayer.Cell cell;
         batch.setProjectionMatrix(camera.combined);
@@ -62,13 +62,12 @@ class Renderer {
                 cell = mountain.getCell(x, y);
                 if (cell != null) {
                     counter++;
-                    batch.draw(cell.getTile().getTextureRegion(), x, y, 1, 1);
+                    batch.draw(cell.getTile().getTextureRegion(), x, y, unitScale, unitScale);
                 } else {
-                    batch.draw(backgroundTexture, x, y, 1, 1);
+                    batch.draw(backgroundTexture, x, y, unitScale, unitScale);
                 }
             }
         }
-        System.out.println(counter);
         batch.end();
     }
 }

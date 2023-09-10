@@ -11,11 +11,15 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
+import com.mygdx.botshooter.actors.weapons.MiniGun;
+import com.mygdx.botshooter.actors.weapons.Weapon;
 
-import java.awt.*;
 
 public class Player extends Group implements InputProcessor {
     private Image mainImg;
+    private Weapon weaponR;
+    private Weapon weaponL;
+
     private Rectangle rect = new Rectangle();
     private float movementSpeed = 20;
 
@@ -36,7 +40,27 @@ public class Player extends Group implements InputProcessor {
         addActor(mainImg);
         setBounds(2,2,4,4);
         setOrigin(getWidth()/2, getHeight()/2);
+
+        assignRightWeapon(new MiniGun());
+        assignLeftWeapon(new MiniGun());
     }
+
+    private void assignRightWeapon(Weapon weapon){
+        weaponR = weapon;
+
+        weaponR.setPosition(2.4f,3);
+        addActor(weaponR);
+        weaponR.setZIndex(0);
+    }
+    private void assignLeftWeapon(Weapon weapon){
+        weaponL = weapon;
+
+        weaponL.setPosition(0.6f,3);
+        addActor(weaponL);
+        weaponL.setZIndex(0);
+    }
+
+
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
@@ -54,6 +78,8 @@ public class Player extends Group implements InputProcessor {
         tmpVector2.sub(getCenter());
         setRotation(tmpVector2.angleDeg() - 90);
     }
+
+
 
     public boolean checkCollisionWithWalls(Rectangle rect){
         if(!collision)
@@ -92,20 +118,32 @@ public class Player extends Group implements InputProcessor {
 
     @Override
     public void act(float delta) {
-        if(Gdx.input.isKeyPressed(Input.Keys.W)) {
+        float DIAGONAL_SCALE = 0.7f;
+
+        if(Gdx.input.isKeyPressed(Input.Keys.W) && Gdx.input.isKeyPressed(Input.Keys.D)) {
+            moveBy((movementSpeed * delta) * DIAGONAL_SCALE, (movementSpeed * delta) * DIAGONAL_SCALE);
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.W) && Gdx.input.isKeyPressed(Input.Keys.A)) {
+            moveBy(-(movementSpeed * delta) * DIAGONAL_SCALE, (movementSpeed * delta) * DIAGONAL_SCALE);
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.S) && Gdx.input.isKeyPressed(Input.Keys.D)) {
+            moveBy((movementSpeed * delta) * DIAGONAL_SCALE, -(movementSpeed * delta) * DIAGONAL_SCALE);
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.S) && Gdx.input.isKeyPressed(Input.Keys.A)) {
+            moveBy(-(movementSpeed * delta) * DIAGONAL_SCALE, -(movementSpeed * delta) * DIAGONAL_SCALE);
+        }
+        else if(Gdx.input.isKeyPressed(Input.Keys.W)) {
             moveBy(0, (movementSpeed * delta));
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.S)) {
+        else if(Gdx.input.isKeyPressed(Input.Keys.S)) {
             moveBy(0, (-movementSpeed * delta));
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.D)) {
+        else if(Gdx.input.isKeyPressed(Input.Keys.D)) {
             moveBy((movementSpeed * delta), 0);
         }
-        if(Gdx.input.isKeyPressed(Input.Keys.A)) {
+        else if(Gdx.input.isKeyPressed(Input.Keys.A)) {
             moveBy((-movementSpeed * delta), 0);
         }
-
-
 
         super.act(delta);
     }
@@ -136,7 +174,8 @@ public class Player extends Group implements InputProcessor {
     }
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
-        return false;
+        faceTowardsMouse(screenX, screenY);
+        return true;
     }
     @Override
     public boolean mouseMoved(int screenX, int screenY) {

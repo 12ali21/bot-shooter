@@ -18,11 +18,9 @@ public class GameStage extends Stage {
     public OrthogonalTiledMapRenderer renderer;
 
 
-    public GameStage() {
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
+    public GameStage(OrthographicCamera camera) {
+        this.camera = camera;
 
-        camera = new OrthographicCamera(10, 10*h/w);
         Viewport viewport = new FitViewport(10, 10, camera);
         setViewport(viewport);
 
