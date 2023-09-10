@@ -19,6 +19,8 @@ public class Player extends Group implements InputProcessor {
     private Rectangle rect = new Rectangle();
     private float movementSpeed = 20;
 
+    private boolean collision = true;
+
     private Map map;
 
     private Vector3 tmpVector3 = new Vector3();
@@ -54,6 +56,9 @@ public class Player extends Group implements InputProcessor {
     }
 
     public boolean checkCollisionWithWalls(Rectangle rect){
+        if(!collision)
+            return false;
+
         Array<Rectangle> cells = map.getWalls(
                 (int) rect.x-1,
                 (int) (rect.x + rect.width) + 1,
@@ -62,7 +67,6 @@ public class Player extends Group implements InputProcessor {
 
         for(Rectangle cell:cells){
             if(rect.overlaps(cell)) {
-                System.out.println("Player rect: "+rect + "Cell that colided Rect"+cell);
                 return true;
             }
         }
@@ -78,10 +82,9 @@ public class Player extends Group implements InputProcessor {
     @Override
     public void moveBy(float x, float y) {
         Rectangle newPos = getRect();
-        System.out.println("Player rect: " + newPos);
 
         newPos.setPosition(newPos.x + x, newPos.y + y);
-
+//        System.out.println(newPos);
         if(!checkCollisionWithWalls(newPos)) {
             super.moveBy(x, y);
         }

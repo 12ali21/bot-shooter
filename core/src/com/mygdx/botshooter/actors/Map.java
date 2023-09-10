@@ -5,21 +5,21 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.botshooter.MapGenerator;
+import com.mygdx.botshooter.map.MapGenerator;
 import com.badlogic.gdx.math.Rectangle;
 
-import java.awt.*;
 
 public class Map extends Actor {
     MapGenerator mapGenerator;
     public Map(OrthographicCamera camera) {
-        mapGenerator = new MapGenerator(123, 1000, 1000, camera);
+        mapGenerator = new MapGenerator(123, 2000, 2000, camera);
         setBounds(0,0,200, 200);
     }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
         mapGenerator.render();
+
     }
 
     public Array<Rectangle> getWalls(int startX, int endX, int startY, int endY){
