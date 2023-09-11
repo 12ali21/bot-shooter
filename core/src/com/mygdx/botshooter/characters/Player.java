@@ -1,25 +1,28 @@
-package com.mygdx.botshooter.actors;
+package com.mygdx.botshooter.characters;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Group;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
-import com.mygdx.botshooter.actors.weapons.MiniGun;
-import com.mygdx.botshooter.actors.weapons.Projectile;
-import com.mygdx.botshooter.actors.weapons.Weapon;
+import com.mygdx.botshooter.characters.weapons.MiniGun;
+import com.mygdx.botshooter.characters.weapons.Projectile;
+import com.mygdx.botshooter.characters.weapons.Weapon;
+import com.mygdx.botshooter.map.MapController;
 
 
-public class Player extends Group implements InputProcessor {
+public class Player implements InputProcessor {
+    private final float SIZE = 4;
+
     public static Array<Projectile> projectiles = new Array<>();
 
-    private Image mainImg;
+    private Sprite sprite;
     private Weapon weaponR;
     private Weapon weaponL;
 
@@ -28,111 +31,86 @@ public class Player extends Group implements InputProcessor {
 
     private boolean collision = true;
 
-    private Map map;
+    private MapController map;
+
+    OrthographicCamera camera;
 
     private Vector3 tmpVector3 = new Vector3();
     private Vector2 tmpVector2 = new Vector2();
 
-    public Player(Map map) {
+    public Player(MapController map, OrthographicCamera camera) {
         this.map = map;
+        this.camera = camera;
 
-        Texture mainTexture = new Texture("player.png");
-        mainImg = new Image(mainTexture);
-        mainImg.setSize(4,4);
-        setSize(mainImg.getWidth(), mainImg.getHeight());
-        addActor(mainImg);
-        setBounds(2,2,4,4);
-        setOrigin(getWidth()/2, getHeight()/2);
+        Texture spriteTexture = new Texture("player.png");
+        sprite = new Sprite(spriteTexture);
 
-        assignRightWeapon(new MiniGun());
-        assignLeftWeapon(new MiniGun());
+        sprite.setPosition(2, 2);
+        sprite.setOrigin(SIZE/2, SIZE/2);
+        sprite.setSize(SIZE, SIZE);
+
+        assignRightWeapon(new MiniGun(camera, new Vector2(0.9f, 1.2f)));
+        assignLeftWeapon(new MiniGun(camera, new Vector2(-0.9f, 1.2f)));
     }
+
 
     private void assignRightWeapon(Weapon weapon){
         weaponR = weapon;
-
-        weaponR.setPosition(2.4f,3);
-        addActor(weaponR);
-        weaponR.setZIndex(0);
     }
     private void assignLeftWeapon(Weapon weapon){
         weaponL = weapon;
-
-        weaponL.setPosition(0.6f,3);
-        addActor(weaponL);
-        weaponL.setZIndex(0);
     }
 
+    public float getWorldOriginX(){
+        return sprite.getX() + sprite.getOriginX();
+    }
+    public float getWorldOriginY(){
+        return sprite.getY() + sprite.getOriginY();
+    }
 
-    private void callProjectilesDraw(Batch batch, float parentAlpha){
+    public void render(Batch batch) {
         for (Projectile p : projectiles) {
-            p.draw(batch, parentAlpha);
+            p.draw(batch);
         }
-    }
-
-    @Override
-    public void draw(Batch batch, float parentAlpha) {
-        callProjectilesDraw(batch, parentAlpha);
-        super.draw(batch, parentAlpha);
-    }
-
-    public Vector2 getCenter(){
-        return new Vector2(getX() + getWidth()/2, getY() + getHeight()/2);
+        weaponL.draw(batch);
+        weaponR.draw(batch);
+        sprite.draw(batch);
     }
 
     public void faceTowardsMouse(int screenX, int screenY){
         tmpVector3.set(screenX, screenY, 0);
-        tmpVector3 = getStage().getCamera().unproject(tmpVector3);
+        tmpVector3 = camera.unproject(tmpVector3);
         tmpVector2.set(tmpVector3.x, tmpVector3.y);
-        tmpVector2.sub(getCenter());
-        setRotation(tmpVector2.angleDeg() - 90);
+        tmpVector2.sub(new Vector2(getWorldOriginX(), getWorldOriginY()));
+        sprite.setRotation(tmpVector2.angleDeg() - 90);
     }
-
-
 
     public boolean checkCollisionWithWalls(Rectangle rect){
         if(!collision)
             return false;
-
-        Array<Rectangle> cells = map.getWalls(
-                (int) rect.x-1,
-                (int) (rect.x + rect.width) + 1,
-                (int) rect.y-1,
-                (int) (rect.y + rect.height) +1);
-
-        for(Rectangle cell:cells){
-            if(rect.overlaps(cell)) {
-                return true;
-            }
-        }
-        return false;
+        return MapController.checkCollisionWithWalls(rect);
     }
 
-    public Rectangle getRect() {
-        float SIZE = 3;
-        float size_offset = getHeight() - SIZE;
-        return new Rectangle(getX() + size_offset/2, getY() + size_offset/2, SIZE, SIZE);
+    public Rectangle getColliderRect() {
+        float COLLIDER_SIZE = 3;
+        float size_offset = sprite.getHeight() - COLLIDER_SIZE;
+        return new Rectangle(sprite.getX() + size_offset/2, sprite.getY() + size_offset/2, COLLIDER_SIZE, COLLIDER_SIZE);
     }
 
-    @Override
     public void moveBy(float x, float y) {
-        Rectangle newPos = getRect();
+        Rectangle collider = getColliderRect();
+        collider.setPosition(collider.x + x, collider.y + y);
 
-        newPos.setPosition(newPos.x + x, newPos.y + y);
 //        System.out.println(newPos);
-        if(!checkCollisionWithWalls(newPos)) {
-            super.moveBy(x, y);
+        if(!checkCollisionWithWalls(collider)) {
+            sprite.setPosition(sprite.getX() + x, sprite.getY() + y);
         }
     }
 
-    private void callProjectilesAction(float delta){
+    public void update(float delta) {
         for (Projectile p : projectiles) {
-            p.act(delta);
+            p.update(delta);
         }
-    }
-    @Override
-    public void act(float delta) {
-        callProjectilesAction(delta);
 
         float DIAGONAL_SCALE = 0.7f;
 
@@ -161,7 +139,16 @@ public class Player extends Group implements InputProcessor {
             moveBy((-movementSpeed * delta), 0);
         }
 
-        super.act(delta);
+        weaponL.update(delta,
+                sprite.getX() + sprite.getOriginX(),
+                sprite.getY() + sprite.getOriginY(),
+                sprite.getRotation());
+
+        weaponR.update(delta,
+                sprite.getX() + sprite.getOriginX(),
+                sprite.getY() + sprite.getOriginY(),
+                sprite.getRotation());
+
     }
 
     @Override

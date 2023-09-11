@@ -39,6 +39,10 @@ public class Timer {
         }
     }
 
+    public void changeInterval(float interval){
+        this.interval = interval;
+    }
+
     /**
      * Stop the timer but keep the cool down to avoid spamming
      */
