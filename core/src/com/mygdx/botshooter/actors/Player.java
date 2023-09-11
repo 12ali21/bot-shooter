@@ -12,10 +12,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.botshooter.actors.weapons.MiniGun;
+import com.mygdx.botshooter.actors.weapons.Projectile;
 import com.mygdx.botshooter.actors.weapons.Weapon;
 
 
 public class Player extends Group implements InputProcessor {
+    public static Array<Projectile> projectiles = new Array<>();
+
     private Image mainImg;
     private Weapon weaponR;
     private Weapon weaponL;
@@ -61,9 +64,15 @@ public class Player extends Group implements InputProcessor {
     }
 
 
+    private void callProjectilesDraw(Batch batch, float parentAlpha){
+        for (Projectile p : projectiles) {
+            p.draw(batch, parentAlpha);
+        }
+    }
 
     @Override
     public void draw(Batch batch, float parentAlpha) {
+        callProjectilesDraw(batch, parentAlpha);
         super.draw(batch, parentAlpha);
     }
 
@@ -116,8 +125,15 @@ public class Player extends Group implements InputProcessor {
         }
     }
 
+    private void callProjectilesAction(float delta){
+        for (Projectile p : projectiles) {
+            p.act(delta);
+        }
+    }
     @Override
     public void act(float delta) {
+        callProjectilesAction(delta);
+
         float DIAGONAL_SCALE = 0.7f;
 
         if(Gdx.input.isKeyPressed(Input.Keys.W) && Gdx.input.isKeyPressed(Input.Keys.D)) {
@@ -162,10 +178,14 @@ public class Player extends Group implements InputProcessor {
     }
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        return false;
+        weaponL.setShooting(true);
+        weaponR.setShooting(true);
+        return true;
     }
     @Override
     public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        weaponL.setShooting(false);
+        weaponR.setShooting(false);
         return false;
     }
     @Override
@@ -175,6 +195,7 @@ public class Player extends Group implements InputProcessor {
     @Override
     public boolean touchDragged(int screenX, int screenY, int pointer) {
         faceTowardsMouse(screenX, screenY);
+
         return true;
     }
     @Override
