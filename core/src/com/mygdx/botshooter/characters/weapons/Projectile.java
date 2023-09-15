@@ -5,24 +5,27 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.botshooter.characters.Player;
 import com.mygdx.botshooter.map.MapController;
+import com.mygdx.botshooter.quad.Quad;
 import com.mygdx.botshooter.util.Timer;
 import com.mygdx.botshooter.util.TimerAction;
 
 public class Projectile {
-    Sprite sprite;
-
-    float velocity;
-    float direction;
+    private Sprite sprite;
+    private float velocity;
+    private float direction;
     private float SIZE = 1f/32;
     private float lifetime = 1f;
 
+    private boolean alive = true;
+
     private Timer lifeTimer;
+    private Quad.Point lastPos;
 
     public Projectile(Texture texture, float velocity, float direction, Vector2 startPos, float sizeScale) {
         sprite = new Sprite(texture);
         SIZE *= sizeScale;
+
 
         this.velocity = velocity;
         this.direction = direction;
@@ -31,6 +34,9 @@ public class Projectile {
         sprite.setSize(SIZE*texture.getWidth(), SIZE*texture.getHeight());
         sprite.setPosition(startPos.x, startPos.y);
         sprite.setOrigin(0,0);
+
+        lastPos = new Quad.Point((int) startPos.x, (int) startPos.y);
+        System.out.println("new projectile" + this);
 
         lifeTimer = new Timer(new TimerAction() {
             @Override
@@ -48,7 +54,11 @@ public class Projectile {
     }
 
     public void destroy(){
-        Player.projectiles.removeValue(this, true);
+        boolean res = ProjectilesUtil.remove(this, lastPos);
+        if(!res)
+            System.out.println("NOT REMOVED " + this);
+        alive = false;
+        lifeTimer.reset();
     }
 
     public Projectile(Texture texture, float velocity, float direction, Vector2 startPos) {
@@ -60,12 +70,24 @@ public class Projectile {
     }
 
     public void update(float delta) {
+        if(!alive) return;
         lifeTimer.tick(delta);
         moveBy(MathUtils.cosDeg(direction)*velocity*delta,
                 MathUtils.sinDeg(direction)*velocity*delta);
+
+        Quad.Point newPos = new Quad.Point((int) sprite.getX(), (int) sprite.getY());
+        if(!newPos.getChunk().equals(lastPos.getChunk())){
+            ProjectilesUtil.updateChunk(this, lastPos, newPos);
+        }
+        lastPos.update(newPos.x, newPos.y);
+    }
+
+    public Vector2 getPosition(){
+        return new Vector2(sprite.getX(), sprite.getY());
     }
 
     public void draw(Batch batch){
+        if(!alive) return;
         if(MapController.checkCollisionWithWalls(sprite.getBoundingRectangle())){
             destroy();
             return;

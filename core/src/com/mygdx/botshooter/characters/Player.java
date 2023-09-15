@@ -13,14 +13,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.botshooter.characters.weapons.MiniGun;
 import com.mygdx.botshooter.characters.weapons.Projectile;
+import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
 import com.mygdx.botshooter.characters.weapons.Weapon;
 import com.mygdx.botshooter.map.MapController;
+import com.mygdx.botshooter.quad.Quad;
 
 
 public class Player implements InputProcessor {
     private final float SIZE = 4;
-
-    public static Array<Projectile> projectiles = new Array<>();
 
     private Sprite sprite;
     private Weapon weaponR;
@@ -69,9 +69,6 @@ public class Player implements InputProcessor {
     }
 
     public void render(Batch batch) {
-        for (Projectile p : projectiles) {
-            p.draw(batch);
-        }
         weaponL.draw(batch);
         weaponR.draw(batch);
         sprite.draw(batch);
@@ -108,9 +105,6 @@ public class Player implements InputProcessor {
     }
 
     public void update(float delta) {
-        for (Projectile p : projectiles) {
-            p.update(delta);
-        }
 
         float DIAGONAL_SCALE = 0.7f;
 

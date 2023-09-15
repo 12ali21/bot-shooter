@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.botshooter.characters.Player;
+import com.mygdx.botshooter.quad.Quad;
 import com.mygdx.botshooter.util.Timer;
 import com.mygdx.botshooter.util.TimerAction;
 import com.mygdx.botshooter.util.Utils;
@@ -103,11 +104,11 @@ public class Weapon {
         positionVector.add(offsetVector);
 //        GameScreen.test(positionVector);
 
-        Player.projectiles.add(new Projectile(bulletTexture,
+        ProjectilesUtil.createProjectile(bulletTexture,
                 100,
                 direction + 90,
                 positionVector,
-                randomSize));
+                randomSize);
     }
 
     public void setShooting(boolean shooting) {

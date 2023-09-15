@@ -7,7 +7,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.botshooter.characters.Biter;
 import com.mygdx.botshooter.characters.Player;
+import com.mygdx.botshooter.characters.weapons.Projectile;
+import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
 import com.mygdx.botshooter.map.MapController;
 
 public class GameScreen implements Screen {
@@ -18,7 +21,7 @@ public class GameScreen implements Screen {
     private MapController map;
 
     private static Vector2 v;
-
+    private Biter biter;
 
 
     @Override
@@ -31,12 +34,16 @@ public class GameScreen implements Screen {
 
         map = new MapController(camera);
         player = new Player(map, camera);
+        biter = new Biter(40,40);
+
         Gdx.input.setInputProcessor(player);
 
     }
 
     private void update(float delta){
+        ProjectilesUtil.updateProjectiles(delta);
         player.update(delta);
+        biter.update(delta);
 
         camera.position.set(player.getWorldOriginX(), player.getWorldOriginY(), 0);
         camera.update();
@@ -47,8 +54,13 @@ public class GameScreen implements Screen {
         update(delta);
 
         mainBatch.begin();
+        // Render map
         map.render();
+        // Render game objects
+
+        ProjectilesUtil.drawProjectiles(mainBatch);
         player.render(mainBatch);
+        biter.render(mainBatch);
         mainBatch.end();
 
         if(v != null){
@@ -59,8 +71,6 @@ public class GameScreen implements Screen {
             shapeRenderer.circle(v.x, v.y, 0.1f, 90);
             shapeRenderer.end();
         }
-
-
     }
 
     @Override
