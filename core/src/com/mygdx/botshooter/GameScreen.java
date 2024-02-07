@@ -22,7 +22,8 @@ public class GameScreen implements Screen {
 
     private static Vector2 v;
     private Biter biter;
-
+    public final float FOV = 128;
+    public final float ASPECT_RATIO = 1920f/1080f;
 
     @Override
     public void show() {
@@ -39,7 +40,6 @@ public class GameScreen implements Screen {
         Gdx.input.setInputProcessor(player);
 
     }
-
     private void update(float delta){
         ProjectilesUtil.updateProjectiles(delta);
         player.update(delta);
@@ -75,8 +75,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = 64;
-        camera.viewportHeight = 64f * height/width;
+        camera.viewportWidth = FOV;
+        camera.viewportHeight = FOV / ASPECT_RATIO;
     }
 
     public static void test(Vector2 v){

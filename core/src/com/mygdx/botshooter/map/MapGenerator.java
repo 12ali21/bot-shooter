@@ -11,12 +11,14 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
 import com.mygdx.botshooter.util.OpenSimplex2S;
 
+import java.util.Random;
+
 
 public class MapGenerator {
     public final double SCALE = 1 / 128f;
     private final int TILE_SIZE = 32;
     public TiledMap map;
-    public Texture tiles;
+
     public OrthographicCamera camera;
     public Renderer renderer;
     public TiledMapTileLayer mountainLayer;
@@ -24,28 +26,36 @@ public class MapGenerator {
 
     public MapGenerator(int seed, int width, int height, OrthographicCamera camera) {
         this.camera = camera;
+        Random random = new Random(seed);
 
-        tiles = new Texture(Gdx.files.internal("tiles.png"));
-        TextureRegion[][] splitTiles = TextureRegion.split(tiles, TILE_SIZE,TILE_SIZE);
+        Texture mountainTiles = new Texture(Gdx.files.internal("mountain.png"));
+        TextureRegion[][] splitTiles = TextureRegion.split(mountainTiles, TILE_SIZE, TILE_SIZE);
+        TextureRegion rockyMountain = splitTiles[0][0];
+
+        Texture groundTiles = new Texture(Gdx.files.internal("gravel.png"));
+        TextureRegion[][] gravelGround = TextureRegion.split(groundTiles, TILE_SIZE, TILE_SIZE);
+
+
         map = new TiledMap();
         MapLayers layers = map.getLayers();
         mountainLayer = new TiledMapTileLayer(width, height, TILE_SIZE, TILE_SIZE);
         mountainLayer.setName(Renderer.MOUNTAIN_LAYER);
-
         groundLayer = new TiledMapTileLayer(width, height, TILE_SIZE, TILE_SIZE);
         groundLayer.setName(Renderer.GROUND_LAYER);
-
-        for(int y = 0; y<height; y++){
-            for(int x = 0; x<width; x++){
+        float noise;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                noise = OpenSimplex2S.noise2(seed, x * SCALE, y * SCALE);
                 // fill with mountain wall
                 Cell cell = new Cell();
-                if( x == 0 || x == width-1 || y ==0 || y == height -1 || (OpenSimplex2S.noise2(seed, x*SCALE, y*SCALE) + 1) /2f > 0.6){
-                    cell.setTile(new StaticTiledMapTile(splitTiles[0][0]));
+                if ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ||
+                        (noise + 1) / 2f > 0.6) {
+                    cell.setTile(new StaticTiledMapTile(rockyMountain));
                     mountainLayer.setCell(x, y, cell);
                 }
                 // fill with gravel
                 else {
-                    cell.setTile(new StaticTiledMapTile(splitTiles[0][1]));
+                    cell.setTile(new StaticTiledMapTile(getRandomRegion(gravelGround, random)));
                     groundLayer.setCell(x, y, cell);
                 }
             }
@@ -56,7 +66,14 @@ public class MapGenerator {
         renderer = new Renderer(map, 1, camera);
     }
 
-    public void render(){
+    // returns a random region of a texture
+    TextureRegion getRandomRegion(TextureRegion[][] regions, Random random) {
+        int pos = random.nextInt(4);
+        int x = pos / regions.length;
+        int y = pos % regions.length;
+        return regions[x][y];
+    }
+    public void render() {
         renderer.setView(camera);
         renderer.render();
     }

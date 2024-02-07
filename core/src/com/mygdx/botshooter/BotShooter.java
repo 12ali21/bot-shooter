@@ -17,8 +17,11 @@ public class BotShooter extends Game {
 
 	private GLProfiler profiler;
 	GameScreen gameScreen;
+//	Color backgroundColor = new Color(145/255f, 117/255f, 93/255f , 0);
+	Color backgroundColor = new Color(0, 0, 0 , 0);
 
 
+	// gets called when the game starts
 	@Override
 	public void create () {
 		profiler = new GLProfiler(Gdx.graphics);
@@ -27,23 +30,25 @@ public class BotShooter extends Game {
 		gameScreen.show();
 	}
 
+	//gets called every time application gets resized
 	@Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
 		gameScreen.resize(width, height);
 	}
 
+	// gets called every frame
 	@Override
 	public void render () {
 		profiler.reset();
-		ScreenUtils.clear(145/255f, 117/255f, 93/255f , 0);
+		ScreenUtils.clear(backgroundColor);
 		gameScreen.render(Gdx.graphics.getDeltaTime());
 
 //		System.out.printf("Draws: %d\n", profiler.getTextureBindings());
 
 	}
 
-
+	// gets called when application gets destroyed
 	@Override
 	public void dispose () {
 		gameScreen.dispose();

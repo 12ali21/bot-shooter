@@ -27,7 +27,7 @@ public class Player implements InputProcessor {
     private Weapon weaponL;
 
     private Rectangle rect = new Rectangle();
-    private float movementSpeed = 20;
+    private float movementSpeed = 40;
 
     private boolean collision = true;
 

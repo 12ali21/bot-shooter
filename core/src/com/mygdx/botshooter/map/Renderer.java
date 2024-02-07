@@ -22,14 +22,14 @@ class Renderer {
     private float unitScale;
     private SpriteBatch batch;
     private OrthographicCamera camera;
-    private TextureRegion backgroundTexture;
+//    private TextureRegion backgroundTexture;
 
     public Renderer(TiledMap map, float unitScale, OrthographicCamera camera) {
         this.map = map;
         this.unitScale = unitScale;
         this.camera = camera;
 
-        backgroundTexture = TextureRegion.split(new Texture(Gdx.files.internal("tiles.png")), 32,32)[0][1];
+//        backgroundTexture = TextureRegion.split(new Texture(Gdx.files.internal("tiles.png")), 32,32)[0][1];
 
         batch = new SpriteBatch();
         batch.setBlendFunction(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
@@ -46,6 +46,7 @@ class Renderer {
 //        Frustum frustum = camera.frustum;
 //        MapLayer ground = map.getLayers().get(GROUND_LAYER);
         TiledMapTileLayer mountain = (TiledMapTileLayer) map.getLayers().get(MOUNTAIN_LAYER);
+        TiledMapTileLayer ground = (TiledMapTileLayer) map.getLayers().get(GROUND_LAYER);
         TiledMapTileLayer.Cell cell;
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
@@ -63,8 +64,12 @@ class Renderer {
                 if (cell != null) {
                     counter++;
                     batch.draw(cell.getTile().getTextureRegion(), x, y, unitScale, unitScale);
-                } else {
-                    batch.draw(backgroundTexture, x, y, unitScale, unitScale);
+                }
+                else {
+                    cell = ground.getCell(x, y);
+                    if(cell != null) {
+                        batch.draw(cell.getTile().getTextureRegion(), x, y, unitScale, unitScale);
+                    }
                 }
             }
         }
