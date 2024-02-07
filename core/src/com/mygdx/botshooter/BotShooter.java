@@ -15,8 +15,9 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 public class BotShooter extends Game {
 
-	private GLProfiler profiler;
 	GameScreen gameScreen;
+	private boolean DEBUG = true;
+	DebugUI debugUI;
 //	Color backgroundColor = new Color(145/255f, 117/255f, 93/255f , 0);
 	Color backgroundColor = new Color(0, 0, 0 , 0);
 
@@ -24,10 +25,12 @@ public class BotShooter extends Game {
 	// gets called when the game starts
 	@Override
 	public void create () {
-		profiler = new GLProfiler(Gdx.graphics);
-		profiler.enable();
 		gameScreen = new GameScreen();
 		gameScreen.show();
+
+		if(DEBUG) {
+			debugUI = new DebugUI(Gdx.graphics);
+		}
 	}
 
 	//gets called every time application gets resized
@@ -35,15 +38,18 @@ public class BotShooter extends Game {
 	public void resize(int width, int height) {
 		super.resize(width, height);
 		gameScreen.resize(width, height);
+		debugUI.resize(width, height);
 	}
 
 	// gets called every frame
 	@Override
 	public void render () {
-		profiler.reset();
 		ScreenUtils.clear(backgroundColor);
-		gameScreen.render(Gdx.graphics.getDeltaTime());
-
+		float delta = Gdx.graphics.getDeltaTime();
+		gameScreen.render(delta);
+		if(DEBUG) {
+			debugUI.render(delta);
+		}
 //		System.out.printf("Draws: %d\n", profiler.getTextureBindings());
 
 	}

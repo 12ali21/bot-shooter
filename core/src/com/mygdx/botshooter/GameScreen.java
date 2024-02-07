@@ -57,7 +57,6 @@ public class GameScreen implements Screen {
         // Render map
         map.render();
         // Render game objects
-
         ProjectilesUtil.drawProjectiles(mainBatch);
         player.render(mainBatch);
         biter.render(mainBatch);

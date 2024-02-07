@@ -36,11 +36,11 @@ public class Biter {
         if(projectiles != null && projectiles.size > 0) {
             for (Projectile p : projectiles) {
                 if (colliderRect.contains(p.getPosition())) {
-                    System.out.println("HIT!");
+//                    System.out.println("HIT!");
                 }
             }
         } else {
-            System.out.println("SECTOR CLEAR!");
+//            System.out.println("SECTOR CLEAR!");
         }
 }
 
