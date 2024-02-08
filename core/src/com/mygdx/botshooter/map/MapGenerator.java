@@ -53,7 +53,7 @@ public class MapGenerator {
                     cell.setTile(new StaticTiledMapTile(rockyMountain));
                     mountainLayer.setCell(x, y, cell);
                 }
-                // fill with gravel
+                // fill the ground with gravel
                 else {
                     cell.setTile(new StaticTiledMapTile(getRandomRegion(gravelGround, random)));
                     groundLayer.setCell(x, y, cell);
