@@ -5,12 +5,13 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.botshooter.Drawable;
 import com.mygdx.botshooter.map.MapController;
 import com.mygdx.botshooter.quad.Quad;
 import com.mygdx.botshooter.util.Timer;
 import com.mygdx.botshooter.util.TimerAction;
 
-public class Projectile {
+public class Projectile implements Drawable {
     private Sprite sprite;
     private float velocity;
     private float direction;
@@ -86,7 +87,7 @@ public class Projectile {
         return new Vector2(sprite.getX(), sprite.getY());
     }
 
-    public void draw(Batch batch){
+    public void render(Batch batch){
         if(!alive) return;
         if(MapController.checkCollisionWithWalls(sprite.getBoundingRectangle())){
             destroy();

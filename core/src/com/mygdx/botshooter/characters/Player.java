@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
+import com.mygdx.botshooter.Drawable;
 import com.mygdx.botshooter.characters.weapons.MiniGun;
 import com.mygdx.botshooter.characters.weapons.Projectile;
 import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
@@ -19,7 +20,7 @@ import com.mygdx.botshooter.map.MapController;
 import com.mygdx.botshooter.quad.Quad;
 
 
-public class Player implements InputProcessor {
+public class Player implements InputProcessor, Drawable {
     private final float SIZE = 4;
 
     private Sprite sprite;
@@ -27,7 +28,7 @@ public class Player implements InputProcessor {
     private Weapon weaponL;
 
     private Rectangle rect = new Rectangle();
-    private float movementSpeed = 40;
+    private float movementSpeed = 100;
 
     private boolean collision = true;
 
@@ -44,8 +45,9 @@ public class Player implements InputProcessor {
 
         Texture spriteTexture = new Texture("player.png");
         sprite = new Sprite(spriteTexture);
-
-        sprite.setPosition(2, 2);
+        // position in world
+        sprite.setPosition(100, 2);
+        // center position with respect to the player
         sprite.setOrigin(SIZE/2, SIZE/2);
         sprite.setSize(SIZE, SIZE);
 
@@ -68,9 +70,10 @@ public class Player implements InputProcessor {
         return sprite.getY() + sprite.getOriginY();
     }
 
+    @Override
     public void render(Batch batch) {
-        weaponL.draw(batch);
-        weaponR.draw(batch);
+        weaponL.render(batch);
+        weaponR.render(batch);
         sprite.draw(batch);
     }
 
@@ -104,6 +107,7 @@ public class Player implements InputProcessor {
         }
     }
 
+    @Override
     public void update(float delta) {
 
         float DIAGONAL_SCALE = 0.7f;

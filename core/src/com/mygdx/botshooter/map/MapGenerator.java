@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.tiles.StaticTiledMapTile;
+import com.mygdx.botshooter.SolidCell;
 import com.mygdx.botshooter.util.OpenSimplex2S;
 
 import java.util.Random;
@@ -47,14 +48,15 @@ public class MapGenerator {
             for (int x = 0; x < width; x++) {
                 noise = OpenSimplex2S.noise2(seed, x * SCALE, y * SCALE);
                 // fill with mountain wall
-                Cell cell = new Cell();
                 if ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ||
                         (noise + 1) / 2f > 0.6) {
+                    Cell cell = new SolidCell();
                     cell.setTile(new StaticTiledMapTile(rockyMountain));
                     mountainLayer.setCell(x, y, cell);
                 }
                 // fill the ground with gravel
                 else {
+                    Cell cell = new Cell();
                     cell.setTile(new StaticTiledMapTile(getRandomRegion(gravelGround, random)));
                     groundLayer.setCell(x, y, cell);
                 }

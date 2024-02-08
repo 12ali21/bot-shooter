@@ -33,7 +33,7 @@ public class ProjectilesUtil {
     }
     public static void drawProjectiles(Batch batch){
         for (Projectile p : ProjectilesUtil.getAllProjectiles()) {
-            p.draw(batch);
+            p.render(batch);
         }
     }
     public static void updateProjectiles(float delta){

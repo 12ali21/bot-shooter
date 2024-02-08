@@ -7,13 +7,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.botshooter.Drawable;
 import com.mygdx.botshooter.characters.Player;
 import com.mygdx.botshooter.quad.Quad;
 import com.mygdx.botshooter.util.Timer;
 import com.mygdx.botshooter.util.TimerAction;
 import com.mygdx.botshooter.util.Utils;
 
-public class Weapon {
+public class Weapon implements Drawable {
 
     protected boolean shooting = false;
     private boolean shootingStarted = false;
@@ -81,10 +82,14 @@ public class Weapon {
         sprite.setRotation(worldDirection);
 
 //        System.out.printf("Parent rotation: %f, Child rotation: %f raw vector angle %f\n ", parentRotation, rotation, vector2.angleDeg());
+        update(delta);
+    }
+
+    public void update(float delta) {
         shootingTimer.tick(delta);
     }
 
-    public void draw(Batch batch){
+    public void render(Batch batch){
         sprite.draw(batch);
     }
 
