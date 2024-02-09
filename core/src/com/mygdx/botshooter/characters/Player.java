@@ -7,10 +7,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.DebugUI;
 import com.mygdx.botshooter.Drawable;
 import com.mygdx.botshooter.OrientedBox;
@@ -28,7 +30,7 @@ public class Player implements InputProcessor, Drawable {
 
     private Rectangle rect = new Rectangle();
     private OrientedBox collider;
-    private float movementSpeed = 280;
+    private float movementSpeed = 160;
     private float rotationSpeed = 200;
 
     private float direction = 90;
@@ -92,31 +94,56 @@ public class Player implements InputProcessor, Drawable {
         weaponR.render(batch);
         sprite.draw(batch);
         collider.debugRender(batch, camera);
-        DebugUI.drawPoint(batch, camera, (int) sprite.getX(), (int) sprite.getY());
     }
 
-    public void faceTowardsMouse(int screenX, int screenY) {
-        tmpVector3.set(screenX, screenY, 0);
-        tmpVector3 = camera.unproject(tmpVector3);
-        tmpVector2.set(tmpVector3.x, tmpVector3.y);
-        tmpVector2.sub(new Vector2(getWorldOriginX(), getWorldOriginY()));
-        sprite.setRotation(tmpVector2.angleDeg() - 90);
+    private Array<Rectangle> getWallsInPath(float dx, float dy) {
+        Rectangle bounds = collider.getAABB();
+
+        bounds.width += dx;
+        bounds.height += dy;
+
+        if(dy < 0) bounds.y -= dy;
+        if(dx < 0) bounds.x -= dx;
+
+        int sX = (int) bounds.x;
+        int eX = (int) (sX + Math.ceil(bounds.width));
+        int sY = (int) bounds.y;
+        int eY = (int) (sY + Math.ceil(bounds.height));
+        return MapController.getWalls(sX, eX, sY, eY);
     }
 
-    public boolean checkCollisionWithWalls(Rectangle rect) {
-        if (!collision)
-            return false;
-        return MapController.checkCollisionWithWalls(rect);
-    }
-
-
-    public Rectangle getColliderRect() {
-        float COLLIDER_SIZE = 3;
-        float size_offset = sprite.getHeight() - COLLIDER_SIZE;
-        return new Rectangle(sprite.getX() + size_offset / 2, sprite.getY() + size_offset / 2, COLLIDER_SIZE, COLLIDER_SIZE);
-    }
 
     public void moveBy(float dx, float dy) {
+        DebugUI.log("len", "" + Math.sqrt(dx * dx + dy * dy));
+        OrientedBox newCollider = collider.copy();
+        newCollider.translate(dx, dy);
+
+        Batch batch = new SpriteBatch();
+        batch.begin();
+        newCollider.debugRender(batch, camera);
+        batch.end();
+
+
+
+        Array<Rectangle> walls = getWallsInPath(dx, dy);
+
+        DebugUI.log("walls", ""+walls.size);
+        float maxPenetration = 0;
+        for (Rectangle wall : walls) {
+            if (newCollider.checkCollision(wall)) {
+                float penetration = newCollider.getPenetrationDepth(dx, dy, wall);
+                if (penetration > maxPenetration) {
+                    maxPenetration = penetration;
+                }
+            }
+        }
+        DebugUI.log("new Collider", "o: " + newCollider.getOrigin() + " p: " + newCollider.getPosition() + " r: " + newCollider.getRotation());
+        DebugUI.log("old Collider", "o: " + collider.getOrigin() + " p: " + collider.getPosition() + " r: " + collider.getRotation());
+        // if there is a collision, move the player to the edge of the wall
+        if (maxPenetration > 0) {
+            dx -= maxPenetration * MathUtils.cosDeg(direction);
+            dy -= maxPenetration * MathUtils.sinDeg(direction);
+        }
         sprite.translate(dx, dy);
         collider.translate(dx, dy);
     }
@@ -147,7 +174,7 @@ public class Player implements InputProcessor, Drawable {
         }
 
         sprite.setRotation(direction - 90);
-        collider.setRotation(direction - 90);
+        collider.setDirection(direction - 90);
 
         weaponL.update(delta,
                 sprite.getX() + sprite.getOriginX(),
