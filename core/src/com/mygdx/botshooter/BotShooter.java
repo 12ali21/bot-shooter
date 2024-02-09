@@ -29,7 +29,7 @@ public class BotShooter extends Game {
 		gameScreen.show();
 
 		if(DEBUG) {
-			debugUI = new DebugUI(Gdx.graphics);
+			debugUI = new DebugUI();
 		}
 	}
 
