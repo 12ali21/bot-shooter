@@ -1,23 +1,15 @@
 package com.mygdx.botshooter;
 
-import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.FPSLogger;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.profiling.GLProfiler;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.PerformanceCounter;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.TimeUtils;
 
 public class BotShooter extends Game {
 
 	GameScreen gameScreen;
 	private boolean DEBUG = true;
-	DebugUI debugUI;
+	Debug debug;
 //	Color backgroundColor = new Color(145/255f, 117/255f, 93/255f , 0);
 	Color backgroundColor = new Color(0, 0, 0 , 0);
 
@@ -29,7 +21,7 @@ public class BotShooter extends Game {
 		gameScreen.show();
 
 		if(DEBUG) {
-			debugUI = new DebugUI();
+			debug = new Debug();
 		}
 	}
 
@@ -38,7 +30,7 @@ public class BotShooter extends Game {
 	public void resize(int width, int height) {
 		super.resize(width, height);
 		gameScreen.resize(width, height);
-		debugUI.resize(width, height);
+		debug.resize(width, height);
 	}
 
 	// gets called every frame
@@ -48,7 +40,7 @@ public class BotShooter extends Game {
 		float delta = Gdx.graphics.getDeltaTime();
 		gameScreen.render(delta);
 		if(DEBUG) {
-			debugUI.render(delta);
+			debug.render(delta);
 		}
 //		System.out.printf("Draws: %d\n", profiler.getTextureBindings());
 

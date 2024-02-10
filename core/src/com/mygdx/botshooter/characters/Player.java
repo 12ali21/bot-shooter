@@ -13,7 +13,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.botshooter.DebugUI;
+import com.mygdx.botshooter.Debug;
 import com.mygdx.botshooter.Drawable;
 import com.mygdx.botshooter.OrientedBox;
 import com.mygdx.botshooter.characters.weapons.MiniGun;
@@ -99,22 +99,24 @@ public class Player implements InputProcessor, Drawable {
     private Array<Rectangle> getWallsInPath(float dx, float dy) {
         Rectangle bounds = collider.getAABB();
 
-        bounds.width += dx;
-        bounds.height += dy;
+        bounds.width += Math.abs(dx);
+        bounds.height += Math.abs(dy);
 
-        if(dy < 0) bounds.y -= dy;
-        if(dx < 0) bounds.x -= dx;
+        if(dy < 0) bounds.y += dy;
+        if(dx < 0) bounds.x += dx;
 
         int sX = (int) bounds.x;
-        int eX = (int) (sX + Math.ceil(bounds.width));
+        int eX = (int) (Math.ceil(bounds.x + bounds.width));
         int sY = (int) bounds.y;
-        int eY = (int) (sY + Math.ceil(bounds.height));
+        int eY = (int) (Math.ceil(bounds.y + bounds.height));
+//        Debug.drawRect("Bounds", bounds);
+
         return MapController.getWalls(sX, eX, sY, eY);
     }
 
 
     public void moveBy(float dx, float dy) {
-        DebugUI.log("len", "" + Math.sqrt(dx * dx + dy * dy));
+        Debug.log("len", "" + Math.sqrt(dx * dx + dy * dy));
         OrientedBox newCollider = collider.copy();
         newCollider.translate(dx, dy);
 
@@ -127,7 +129,11 @@ public class Player implements InputProcessor, Drawable {
 
         Array<Rectangle> walls = getWallsInPath(dx, dy);
 
-        DebugUI.log("walls", ""+walls.size);
+//        for(Rectangle wall : walls) {
+//            Debug.drawRect(""+wall, wall);
+//        }
+
+        Debug.log("walls", ""+walls.size);
         float maxPenetration = 0;
         for (Rectangle wall : walls) {
             if (newCollider.checkCollision(wall)) {
@@ -137,8 +143,8 @@ public class Player implements InputProcessor, Drawable {
                 }
             }
         }
-        DebugUI.log("new Collider", "o: " + newCollider.getOrigin() + " p: " + newCollider.getPosition() + " r: " + newCollider.getRotation());
-        DebugUI.log("old Collider", "o: " + collider.getOrigin() + " p: " + collider.getPosition() + " r: " + collider.getRotation());
+        Debug.log("new Collider", "o: " + newCollider.getOrigin() + " p: " + newCollider.getPosition() + " r: " + newCollider.getRotation());
+        Debug.log("old Collider", "o: " + collider.getOrigin() + " p: " + collider.getPosition() + " r: " + collider.getRotation());
         // if there is a collision, move the player to the edge of the wall
         if (maxPenetration > 0) {
             dx -= maxPenetration * MathUtils.cosDeg(direction);
@@ -150,8 +156,8 @@ public class Player implements InputProcessor, Drawable {
 
     @Override
     public void update(float delta) {
-        DebugUI.log("Player X", "" + sprite.getX());
-        DebugUI.log("Player Y", "" + sprite.getY());
+        Debug.log("Player X", "" + sprite.getX());
+        Debug.log("Player Y", "" + sprite.getY());
         float DIAGONAL_SCALE = 0.7f;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {

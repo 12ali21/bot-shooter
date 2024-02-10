@@ -32,6 +32,7 @@ public class GameScreen implements Screen {
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
         camera = new OrthographicCamera(10, 10*h/w);
+        Debug.setCamera(camera);
 
         map = new MapController(camera);
         player = new Player(map, camera);
