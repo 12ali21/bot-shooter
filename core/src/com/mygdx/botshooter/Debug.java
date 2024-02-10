@@ -26,6 +26,7 @@ public class Debug {
     private static FPSLogger logger;
     private static HashMap<String, Label> logs;
     private static HashMap<String, Rectangle> rects;
+    private static Runtime runtime;
 
     private static final String FPS_TAG = "FPS";
     private static final String BINDS_TAG = "binds";
@@ -37,6 +38,7 @@ public class Debug {
 
     static {
         logger = new FPSLogger();
+        runtime = Runtime.getRuntime();
 
         profiler = new GLProfiler(Gdx.graphics);
         profiler.enable();
@@ -111,6 +113,7 @@ public class Debug {
         timeBuffer += delta;
         if (timeBuffer > 1) {
             timeBuffer = 0;
+            log("Memory", "" + (runtime.totalMemory() - runtime.freeMemory()) / 1048576 + "MB / "+ runtime.maxMemory() / 1048576 + "MB");
             log(FPS_TAG, "" + (int) (1 / delta));
             log(BINDS_TAG, "" + profiler.getTextureBindings());
             log(DRAWS_TAG, "" + profiler.getDrawCalls());

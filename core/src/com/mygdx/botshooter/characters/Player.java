@@ -30,8 +30,16 @@ public class Player implements InputProcessor, Drawable {
 
     private Rectangle rect = new Rectangle();
     private OrientedBox collider;
-    private float movementSpeed = 160;
+
+    private float velocity = 0;
+    private float acceleration = 30;
+    private float deceleration = acceleration * 2;
+    private float maxMovementSpeed = 160;
+    private float maxBackwardSpeed = maxMovementSpeed / 3f;
+
     private float rotationSpeed = 200;
+
+    private float frictionWithWalls = 0.5f;
 
     private float direction = 90;
 
@@ -98,18 +106,26 @@ public class Player implements InputProcessor, Drawable {
 
     private Array<Rectangle> getWallsInPath(float dx, float dy) {
         Rectangle bounds = collider.getAABB();
+        Debug.log("dx, dy", "" + dx + ", " + dy);
+        if (dx <= 0) {
+            bounds.x += dx;
+            bounds.width -= dx;
+        } else {
+            bounds.width += dx;
+        }
 
-        bounds.width += Math.abs(dx);
-        bounds.height += Math.abs(dy);
-
-        if(dy < 0) bounds.y += dy;
-        if(dx < 0) bounds.x += dx;
+        if (dy <= 0) {
+            bounds.y += dy;
+            bounds.height -= dy;
+        } else {
+            bounds.height += dy;
+        }
 
         int sX = (int) bounds.x;
         int eX = (int) (Math.ceil(bounds.x + bounds.width));
         int sY = (int) bounds.y;
         int eY = (int) (Math.ceil(bounds.y + bounds.height));
-//        Debug.drawRect("Bounds", bounds);
+        Debug.drawRect("Bounds", bounds);
 
         return MapController.getWalls(sX, eX, sY, eY);
     }
@@ -126,29 +142,39 @@ public class Player implements InputProcessor, Drawable {
         batch.end();
 
 
-
         Array<Rectangle> walls = getWallsInPath(dx, dy);
 
-//        for(Rectangle wall : walls) {
-//            Debug.drawRect(""+wall, wall);
-//        }
+        for (Rectangle wall : walls) {
+            Debug.drawRect("" + wall, wall);
+        }
 
-        Debug.log("walls", ""+walls.size);
-        float maxPenetration = 0;
+        Debug.log("walls", "" + walls.size);
+        double maxPenetration = 0;
+        double penetration;
         for (Rectangle wall : walls) {
             if (newCollider.checkCollision(wall)) {
-                float penetration = newCollider.getPenetrationDepth(dx, dy, wall);
+                if (velocity > 0)
+                    penetration = newCollider.getPenetrationDepth(dx, dy, wall, true);
+                else
+                    penetration = newCollider.getPenetrationDepth(dx, dy, wall, false);
+
                 if (penetration > maxPenetration) {
                     maxPenetration = penetration;
                 }
             }
         }
-        Debug.log("new Collider", "o: " + newCollider.getOrigin() + " p: " + newCollider.getPosition() + " r: " + newCollider.getRotation());
-        Debug.log("old Collider", "o: " + collider.getOrigin() + " p: " + collider.getPosition() + " r: " + collider.getRotation());
+        Debug.log("Penetration", "" + maxPenetration);
         // if there is a collision, move the player to the edge of the wall
         if (maxPenetration > 0) {
-            dx -= maxPenetration * MathUtils.cosDeg(direction);
-            dy -= maxPenetration * MathUtils.sinDeg(direction);
+            // a trick to avoid a bug that let player go through the wall when reversing
+            if (maxPenetration < SIZE) {
+                // get the direction from dx and dy
+                float angle = MathUtils.atan2Deg(dy, dx);
+                dx -= maxPenetration * MathUtils.cosDeg(angle);
+                dy -= maxPenetration * MathUtils.sinDeg(angle);
+            }
+
+            velocity = 0;
         }
         sprite.translate(dx, dy);
         collider.translate(dx, dy);
@@ -158,24 +184,32 @@ public class Player implements InputProcessor, Drawable {
     public void update(float delta) {
         Debug.log("Player X", "" + sprite.getX());
         Debug.log("Player Y", "" + sprite.getY());
-        float DIAGONAL_SCALE = 0.7f;
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            moveBy((float) (MathUtils.cosDeg(direction) * movementSpeed * delta), (float) (MathUtils.sinDeg(direction) * movementSpeed * delta));
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                direction += rotationSpeed * delta;
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                direction -= rotationSpeed * delta;
+            velocity += acceleration * delta;
+            if (velocity > maxMovementSpeed) {
+                velocity = maxMovementSpeed;
             }
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            moveBy((float) (-MathUtils.cosDeg(direction) * movementSpeed * delta), (float) (-MathUtils.sinDeg(direction) * movementSpeed * delta));
+            velocity -= deceleration * delta;
+            if (velocity < -maxBackwardSpeed) {
+                velocity = -maxBackwardSpeed;
+            }
+//            moveBy(-MathUtils.cosDeg(direction) * velocity * delta,
+//                    -MathUtils.sinDeg(direction) * velocity * delta);
+
+
+        }
+        moveBy(MathUtils.cosDeg(direction) * velocity * delta,
+                MathUtils.sinDeg(direction) * velocity * delta);
+
+        if (velocity != 0) {
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                direction -= rotationSpeed * delta;
+                direction += rotationSpeed * delta;
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                direction += rotationSpeed * delta;
+                direction -= rotationSpeed * delta;
             }
         }
 

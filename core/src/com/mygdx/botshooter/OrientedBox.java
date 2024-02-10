@@ -6,53 +6,14 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
+import com.mygdx.botshooter.Vector2;
 
 import java.util.ArrayList;
-
-class Vector2 {
-    private float x, y;
-
-    public Vector2(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public void setPosition(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
-
-    public float getX() {
-        return x;
-    }
-
-    public float getY() {
-        return y;
-    }
-
-    public Vector2 nor() {
-        double len = Math.pow(x, 2) + Math.pow(y, 2);
-        len = Math.sqrt(len);
-        if (len == 0) return this;
-        else
-            return new Vector2((float) (this.x / len), (float) (this.y / len));
-    }
-
-    public float dot(Vector2 v2) {
-        return x * v2.x + y * v2.y;
-    }
-
-    public Vector2 copy() {
-        return new Vector2(x, y);
-    }
-
-    @Override
-    public String toString() {
-        return "(" + x + " , " + y + ")";
-    }
-}
+import java.util.List;
 
 public class OrientedBox {
+    private final double PENETRATION_ERROR = 0.05;
+    private final double height;
     ArrayList<Vector2> defVertices = new ArrayList<>();
     ArrayList<Vector2> vertices = new ArrayList<>();
     private final Vector2 origin;
@@ -85,13 +46,16 @@ public class OrientedBox {
         defVertices.add(sub(v3, position));
         defVertices.add(sub(v4, position));
 
+        //FIXME: make it better?
+        height = defVertices.get(1).getY() - defVertices.get(0).getY();
+
 
     }
 
     /**
      * vertices in clock-wise order
      */
-    public OrientedBox(float x1, float y1, float x2, float y2, float x3, float y3, float x4, float y4) {
+    public OrientedBox(double x1, double y1, double x2, double y2, double x3, double y3, double x4, double y4) {
         this(new Vector2(x1, y1),
                 new Vector2(x2, y2),
                 new Vector2(x3, y3),
@@ -101,7 +65,7 @@ public class OrientedBox {
     /**
      * sets the bottom left corner position of the box in world coordinates
      */
-    public void setPosition(float x, float y) {
+    public void setPosition(double x, double y) {
         for (int i = 0; i < vertices.size(); i++) {
             Vector2 dv = defVertices.get(i);
             dv.setPosition(dv.getX() + position.getX() - x, dv.getY() + position.getY() - y);
@@ -112,7 +76,7 @@ public class OrientedBox {
     /**
      * sets the origin of the box with respect to the box's local coordinate system
      */
-    public void setOrigin(float x, float y) {
+    public void setOrigin(double x, double y) {
         origin.setPosition(x, y);
     }
 
@@ -145,18 +109,20 @@ public class OrientedBox {
             defVertex = defVertices.get(i);
             newVertex = vertices.get(i);
 
-            float x = defVertex.getX() - origin.getX();
-            float y = defVertex.getY() - origin.getY();
-            newVertex.setPosition((float) (x * MathUtils.cosDeg(angle) - y * MathUtils.sinDeg(angle) + originInWorld.getX()),
-                    (float) (x * MathUtils.sinDeg(angle) + y * MathUtils.cosDeg(angle) + originInWorld.getY()));
+            double x = defVertex.getX() - origin.getX();
+            double y = defVertex.getY() - origin.getY();
+            newVertex.setPosition((double) (x * MathUtils.cosDeg(angle) - y * MathUtils.sinDeg(angle) + originInWorld.getX()),
+                    (double) (x * MathUtils.sinDeg(angle) + y * MathUtils.cosDeg(angle) + originInWorld.getY()));
         }
     }
 
-    public void translate(float dx, float dy) {
+    public void translate(double dx, double dy) {
         for (Vector2 v : vertices) {
             v.setPosition(v.getX() + dx, v.getY() + dy);
         }
         position.setPosition(position.getX() + dx, position.getY() + dy);
+        Debug.log("player vertices", "" + vertices);
+        Debug.log("player position", "" + position);
     }
 
     /**
@@ -166,12 +132,12 @@ public class OrientedBox {
         float minX = Float.POSITIVE_INFINITY, minY = Float.POSITIVE_INFINITY;
         float maxX = Float.NEGATIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
         for (Vector2 v : vertices) {
-            minX = Math.min(minX, v.getX());
-            minY = Math.min(minY, v.getY());
-            maxX = Math.max(maxX, v.getX());
-            maxY = Math.max(maxY, v.getY());
+            minX = (float) Math.min(minX, v.getX());
+            minY = (float) Math.min(minY, v.getY());
+            maxX = (float) Math.max(maxX, v.getX());
+            maxY = (float) Math.max(maxY, v.getY());
         }
-        return new Rectangle(minX, minY, maxX - minX, maxY - minY);
+        return new Rectangle(minX, minY, (maxX - minX), (maxY - minY));
     }
 
     public static Vector2 getEdgeVector(OrientedBox box, Vector2 vertex) {
@@ -199,10 +165,10 @@ public class OrientedBox {
      */
     private static boolean SAT(OrientedBox b1, OrientedBox b2) {
         Vector2 normal;
-        float minPen;
+        double minPen;
         for (Vector2 va : b1.vertices) {
             normal = perpendicular(getEdgeVector(b1, va)).nor();
-            minPen = Float.POSITIVE_INFINITY;
+            minPen = Double.POSITIVE_INFINITY;
             for (Vector2 vb : b2.vertices) {
                 minPen = Math.min(minPen, normal.dot(sub(vb, va)));
             }
@@ -241,16 +207,21 @@ public class OrientedBox {
                 (vertices.get(1).getY() + vertices.get(2).getY()) / 2);
     }
 
+    public Vector2 getBackVector() {
+        return new Vector2((vertices.get(0).getX() + vertices.get(3).getX()) / 2,
+                (vertices.get(0).getY() + vertices.get(3).getY()) / 2);
+    }
+
     public void debugRender(Batch batch, Camera camera) {
         batch.end();
         shapeRenderer.setProjectionMatrix(camera.combined);
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
         shapeRenderer.setColor(Color.RED);
         shapeRenderer.polygon(new float[]{
-                vertices.get(0).getX(), vertices.get(0).getY(),
-                vertices.get(1).getX(), vertices.get(1).getY(),
-                vertices.get(2).getX(), vertices.get(2).getY(),
-                vertices.get(3).getX(), vertices.get(3).getY()
+                (float) vertices.get(0).getX(), (float) vertices.get(0).getY(),
+                (float) vertices.get(1).getX(), (float) vertices.get(1).getY(),
+                (float) vertices.get(2).getX(), (float) vertices.get(2).getY(),
+                (float) vertices.get(3).getX(), (float) vertices.get(3).getY()
         });
         shapeRenderer.end();
         batch.begin();
@@ -271,19 +242,84 @@ public class OrientedBox {
         System.out.println(box1.checkCollision(box2));
     }
 
-    public float getPenetrationDepth(float dx, float dy, OrientedBox wall) {
-        Vector2 front = getFrontVector();
-        Vector2 normal = (new Vector2(dx, dy)).nor();
-        float minPen = 0;
-        for (Vector2 vb : wall.vertices) {
-            minPen = Math.min(minPen, normal.dot(sub(vb, front)));
+    private List<Vector2> getIntersections(double dx, double dy, Vector2 v, Rectangle wall) {
+        List<Vector2> intersections = new ArrayList<>();
+
+        if (dx == 0) {
+            intersections.add(new Vector2(v.getX(), wall.getY()));
+            intersections.add(new Vector2(v.getX(), wall.getY() + wall.getHeight()));
+            return intersections;
         }
-        return Math.abs(minPen);
+
+        double m = dy / dx;
+        double b = v.getY() - m * v.getX();
+        Debug.log("line: ", "" + m + "x + " + b);
+        Vector2 intersect;
+        intersect = new Vector2(wall.x, m * wall.x + b);
+        if (intersect.getY() > wall.getY() && intersect.getY() < wall.getY() + wall.getHeight()) {
+            intersections.add(intersect);
+        }
+
+        intersect = new Vector2(wall.x + wall.width, m * (wall.x + wall.width) + b);
+        if (intersect.getY() > wall.getY() && intersect.getY() < wall.getY() + wall.getHeight()) {
+            intersections.add(intersect);
+        }
+
+        intersect = new Vector2((wall.y - b) / m, wall.y);
+        if (intersect.getX() > wall.getX() && intersect.getX() < wall.getX() + wall.getWidth()) {
+            intersections.add(intersect);
+        }
+        intersect = new Vector2((wall.y + wall.height - b) / m, wall.y + wall.height);
+        if (intersect.getX() > wall.getX() && intersect.getX() < wall.getX() + wall.getWidth()) {
+            intersections.add(intersect);
+        }
+        Debug.log("intersections: ", "" + intersections.size());
+        return intersections;
     }
 
-    public float getPenetrationDepth(float dx, float dy, Rectangle wall) {
-        return getPenetrationDepth(dx, dy, getBox(wall));
+    private boolean isBetweenLines(Vector2 point, double m, Vector2 v1, Vector2 v2) {
+        double b1 = v1.getY() - m * v1.getX();
+        double b2 = v2.getY() - m * v2.getX();
+        double b0 = point.getY() - m * point.getX();
+        return b0 > Math.min(b1, b2) && b0 < Math.max(b1, b2);
     }
+
+    private List<Vector2> getPenetrationPoints(double dx, double dy, Vector2 v1, Vector2 v2, Rectangle wall) {
+        List<Vector2> points = new ArrayList<>();
+        ArrayList<Vector2> wallVertices = getBox(wall).vertices;
+        // if a wall vertex is inside the volume, add it to the possible points
+        for (Vector2 vertex : wallVertices) {
+            if (isBetweenLines(vertex, dy / dx, vertices.get(0), vertices.get(2)) &&
+                    isBetweenLines(vertex, -dx / dy, vertices.get(0), vertices.get(1))) {
+                points.add(vertex);
+            }
+        }
+        // also add the intersection points
+        points = getIntersections(dx, dy, v1, wall);
+        points.addAll(getIntersections(dx, dy, v2, wall));
+        return points;
+    }
+
+    public double getPenetrationDepth(double dx, double dy, Rectangle wall, boolean goingForward) {
+        Vector2 front1;
+        Vector2 front2;
+        if (goingForward) {
+            front1 = vertices.get(1);
+            front2 = vertices.get(2);
+        } else {
+            front1 = vertices.get(0);
+            front2 = vertices.get(3);
+        }
+        Vector2 normal = (new Vector2(dx, dy)).nor();
+        double minPen = 0;
+        for (Vector2 vb : getPenetrationPoints(dx, dy, front1, front2, wall)) {
+            minPen = Math.min(minPen, normal.dot(sub(vb, front1)));
+        }
+        double depth = Math.abs(minPen);
+        System.out.println(depth);
+        return depth;
+    }
+
 
     public Vector2 getPosition() {
         return position;
