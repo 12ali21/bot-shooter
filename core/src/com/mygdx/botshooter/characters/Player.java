@@ -163,7 +163,6 @@ public class Player implements InputProcessor, Drawable {
                 }
             }
         }
-        Debug.log("Penetration", "" + maxPenetration);
         // if there is a collision, move the player to the edge of the wall
         if (maxPenetration > 0) {
             // a trick to avoid a bug that let player go through the wall when reversing

@@ -22,7 +22,7 @@ public class Vector2 {
     }
 
     public Vector2 nor() {
-        double len = Math.pow(x, 2) + Math.pow(y, 2);
+        double len = x*x + y*y;
         len = Math.sqrt(len);
         if (len == 0) return this;
         else

@@ -253,7 +253,6 @@ public class OrientedBox {
 
         double m = dy / dx;
         double b = v.getY() - m * v.getX();
-        Debug.log("line: ", "" + m + "x + " + b);
         Vector2 intersect;
         intersect = new Vector2(wall.x, m * wall.x + b);
         if (intersect.getY() > wall.getY() && intersect.getY() < wall.getY() + wall.getHeight()) {
@@ -295,7 +294,7 @@ public class OrientedBox {
             }
         }
         // also add the intersection points
-        points = getIntersections(dx, dy, v1, wall);
+        points.addAll(getIntersections(dx, dy, v1, wall));
         points.addAll(getIntersections(dx, dy, v2, wall));
         return points;
     }
@@ -315,9 +314,7 @@ public class OrientedBox {
         for (Vector2 vb : getPenetrationPoints(dx, dy, front1, front2, wall)) {
             minPen = Math.min(minPen, normal.dot(sub(vb, front1)));
         }
-        double depth = Math.abs(minPen);
-        System.out.println(depth);
-        return depth;
+        return Math.abs(minPen);
     }
 
 
