@@ -22,7 +22,7 @@ import com.mygdx.botshooter.map.MapController;
 
 
 public class Player implements InputProcessor, Drawable {
-    private final float SIZE = 4;
+    private final float SIZE = 6;
 
     private Sprite sprite;
     private Weapon weaponR;
@@ -37,8 +37,10 @@ public class Player implements InputProcessor, Drawable {
     private float maxMovementSpeed = 160;
     private float maxBackwardSpeed = maxMovementSpeed / 3f;
 
-    private float rotationSpeed = 200;
+    private float rotationSpeed = 0;
+    private float maxRotationSpeed = 200;
 
+    private float friction = 0.7f;
     private float frictionWithWalls = 0.5f;
 
     private float direction = 90;
@@ -58,7 +60,7 @@ public class Player implements InputProcessor, Drawable {
 
         int posX = 100, posY = 2;
 
-        Texture spriteTexture = new Texture("player.png");
+        Texture spriteTexture = new Texture("player_3.png");
         sprite = new Sprite(spriteTexture);
         // position in world
         sprite.setPosition(posX, posY);
@@ -67,10 +69,10 @@ public class Player implements InputProcessor, Drawable {
         sprite.setSize(SIZE, SIZE);
 
         // create the collider
-        collider = new OrientedBox(posX + 1, posY,
-                posX + 1, posY + SIZE,
-                posX + SIZE - 1, posY + SIZE,
-                posX + SIZE - 1, posY);
+        collider = new OrientedBox(posX + 1.5, posY,
+                posX + 1.5, posY + SIZE-1.5,
+                posX + SIZE - 1.5, posY + SIZE-1.5,
+                posX + SIZE - 1.5, posY);
         collider.setPosition(posX, posY);
         collider.setOrigin(SIZE / 2, SIZE / 2);
 
@@ -98,10 +100,20 @@ public class Player implements InputProcessor, Drawable {
 
     @Override
     public void render(Batch batch) {
-        weaponL.render(batch);
-        weaponR.render(batch);
+//        weaponL.render(batch);
+//        weaponR.render(batch);
         sprite.draw(batch);
         collider.debugRender(batch, camera);
+    }
+
+    private Array<Rectangle> getWalls(Rectangle bounds) {
+        int sX = (int) bounds.x;
+        int eX = (int) (Math.ceil(bounds.x + bounds.width));
+        int sY = (int) bounds.y;
+        int eY = (int) (Math.ceil(bounds.y + bounds.height));
+        Debug.drawRect("Bounds", bounds);
+
+        return MapController.getWalls(sX, eX, sY, eY);
     }
 
     private Array<Rectangle> getWallsInPath(float dx, float dy) {
@@ -121,17 +133,15 @@ public class Player implements InputProcessor, Drawable {
             bounds.height += dy;
         }
 
-        int sX = (int) bounds.x;
-        int eX = (int) (Math.ceil(bounds.x + bounds.width));
-        int sY = (int) bounds.y;
-        int eY = (int) (Math.ceil(bounds.y + bounds.height));
-        Debug.drawRect("Bounds", bounds);
-
-        return MapController.getWalls(sX, eX, sY, eY);
+        return getWalls(bounds);
     }
 
 
     public void moveBy(float dx, float dy) {
+        /*FIXME: There is still a bug that let player go through the wall when reversing and rotating to a wall
+            should be fixed by checking the collision with the wall while rotating
+        * */
+
         Debug.log("len", "" + Math.sqrt(dx * dx + dy * dy));
         OrientedBox newCollider = collider.copy();
         newCollider.translate(dx, dy);
@@ -178,6 +188,23 @@ public class Player implements InputProcessor, Drawable {
         sprite.translate(dx, dy);
         collider.translate(dx, dy);
     }
+    public void rotateBy(float rotation) {
+//        OrientedBox newCollider = collider.copy();
+//        newCollider.setDirection(direction + rotation - 90);
+//        // check if by rotating collision with walls will happen
+//        Array<Rectangle> walls = getWalls(newCollider.getAABB());
+//        for(Rectangle wall : walls) {
+//            if(newCollider.checkCollision(wall)) {
+//                return;
+//            }
+//        }
+//        System.out.println("rotation: " + rotation);
+        direction += rotation;
+
+        collider.setDirection(direction - 90);
+        sprite.setRotation(direction + - 90);
+
+    }
 
     @Override
     public void update(float delta) {
@@ -195,25 +222,33 @@ public class Player implements InputProcessor, Drawable {
             if (velocity < -maxBackwardSpeed) {
                 velocity = -maxBackwardSpeed;
             }
-//            moveBy(-MathUtils.cosDeg(direction) * velocity * delta,
-//                    -MathUtils.sinDeg(direction) * velocity * delta);
-
-
+        }
+        if(!Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.W)){
+            if(Math.abs(velocity) < 0.5) {
+                velocity = 0;
+            } else {
+                velocity -= (velocity > 0 ? deceleration : -deceleration) * friction * delta;
+            }
         }
         moveBy(MathUtils.cosDeg(direction) * velocity * delta,
                 MathUtils.sinDeg(direction) * velocity * delta);
 
-        if (velocity != 0) {
+        if (velocity > 0) {
             if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                direction += rotationSpeed * delta;
+                rotateBy(maxRotationSpeed * delta);
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                direction -= rotationSpeed * delta;
+                rotateBy(-maxRotationSpeed * delta);
+            }
+        } else if(velocity < 0) {
+            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+                rotateBy(-maxRotationSpeed * delta);
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+                rotateBy(maxRotationSpeed * delta);
             }
         }
 
-        sprite.setRotation(direction - 90);
-        collider.setDirection(direction - 90);
 
         weaponL.update(delta,
                 sprite.getX() + sprite.getOriginX(),
