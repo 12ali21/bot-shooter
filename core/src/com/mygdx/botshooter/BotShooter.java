@@ -2,12 +2,13 @@ package com.mygdx.botshooter;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class BotShooter extends Game {
 
-	GameScreen gameScreen;
+	Screen gameScreen;
 	private boolean DEBUG = true;
 	Debug debug;
 //	Color backgroundColor = new Color(145/255f, 117/255f, 93/255f , 0);
@@ -17,7 +18,7 @@ public class BotShooter extends Game {
 	// gets called when the game starts
 	@Override
 	public void create () {
-		gameScreen = new GameScreen();
+		gameScreen = new PhysicsTestScreen();
 		gameScreen.show();
 
 		if(DEBUG) {

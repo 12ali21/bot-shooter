@@ -8,7 +8,8 @@ import com.mygdx.botshooter.BotShooter;
 public class DesktopLauncher {
 	public static void main (String[] arg) {
 		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setForegroundFPS(60);
+		config.setForegroundFPS(0);
+
 		config.setTitle("Shoot!");
 		new Lwjgl3Application(new BotShooter(), config);
 	}
