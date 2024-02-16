@@ -12,13 +12,17 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.Debug;
 import com.mygdx.botshooter.Drawable;
+import com.mygdx.botshooter.GameScreen;
 import com.mygdx.botshooter.OrientedBox;
 import com.mygdx.botshooter.characters.weapons.MiniGun;
 import com.mygdx.botshooter.characters.weapons.Weapon;
 import com.mygdx.botshooter.map.MapController;
+
+import java.util.ArrayList;
 
 
 public class Player implements InputProcessor, Drawable {
@@ -32,7 +36,7 @@ public class Player implements InputProcessor, Drawable {
     private OrientedBox collider;
 
     private float velocity = 0;
-    private float acceleration = 30;
+    private float acceleration = 300;
     private float deceleration = acceleration * 2;
     private float maxMovementSpeed = 160;
     private float maxBackwardSpeed = maxMovementSpeed / 3f;
@@ -50,6 +54,8 @@ public class Player implements InputProcessor, Drawable {
     private MapController map;
 
     OrthographicCamera camera;
+    Body body;
+
 
     private Vector3 tmpVector3 = new Vector3();
     private Vector2 tmpVector2 = new Vector2();
@@ -70,12 +76,31 @@ public class Player implements InputProcessor, Drawable {
 
         // create the collider
         collider = new OrientedBox(posX + 1.5, posY,
-                posX + 1.5, posY + SIZE-1.5,
-                posX + SIZE - 1.5, posY + SIZE-1.5,
+                posX + 1.5, posY + SIZE - 1.5,
+                posX + SIZE - 1.5, posY + SIZE - 1.5,
                 posX + SIZE - 1.5, posY);
         collider.setPosition(posX, posY);
         collider.setOrigin(SIZE / 2, SIZE / 2);
 
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(posX, posY);
+
+        body = GameScreen.world.createBody(bodyDef);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(SIZE / 2, SIZE / 2);
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 0.5f;
+        fixtureDef.friction = 0.6f;
+        fixtureDef.restitution = 0.1f;
+
+        Fixture fixture = body.createFixture(fixtureDef);
+        body.setAngularDamping(6f);
+        body.setLinearDamping(1f);
+
+        shape.dispose();
 
         assignRightWeapon(new MiniGun(camera, new Vector2(0.9f, 1.2f)));
         assignLeftWeapon(new MiniGun(camera, new Vector2(-0.9f, 1.2f)));
@@ -103,7 +128,7 @@ public class Player implements InputProcessor, Drawable {
 //        weaponL.render(batch);
 //        weaponR.render(batch);
         sprite.draw(batch);
-        collider.debugRender(batch, camera);
+//        collider.debugRender(batch, camera);
     }
 
     private Array<Rectangle> getWalls(Rectangle bounds) {
@@ -116,31 +141,16 @@ public class Player implements InputProcessor, Drawable {
         return MapController.getWalls(sX, eX, sY, eY);
     }
 
-    private Array<Rectangle> getWallsInPath(float dx, float dy) {
-        Rectangle bounds = collider.getAABB();
-        Debug.log("dx, dy", "" + dx + ", " + dy);
-        if (dx <= 0) {
-            bounds.x += dx;
-            bounds.width -= dx;
-        } else {
-            bounds.width += dx;
-        }
-
-        if (dy <= 0) {
-            bounds.y += dy;
-            bounds.height -= dy;
-        } else {
-            bounds.height += dy;
-        }
+    private Array<Rectangle> getWallsInPath() {
+        Rectangle bounds = new Rectangle(body.getPosition().x - 6, body.getPosition().y - 6, SIZE * 2, SIZE * 2);
+//        Debug.log("dx, dy", "" + dx + ", " + dy);
 
         return getWalls(bounds);
     }
 
 
+    /*
     public void moveBy(float dx, float dy) {
-        /*FIXME: There is still a bug that let player go through the wall when reversing and rotating to a wall
-            should be fixed by checking the collision with the wall while rotating
-        * */
 
         Debug.log("len", "" + Math.sqrt(dx * dx + dy * dy));
         OrientedBox newCollider = collider.copy();
@@ -148,15 +158,15 @@ public class Player implements InputProcessor, Drawable {
 
         Batch batch = new SpriteBatch();
         batch.begin();
-        newCollider.debugRender(batch, camera);
+//        newCollider.debugRender(batch, camera);
         batch.end();
 
 
         Array<Rectangle> walls = getWallsInPath(dx, dy);
 
-        for (Rectangle wall : walls) {
-            Debug.drawRect("" + wall, wall);
-        }
+//        for (Rectangle wall : walls) {
+//            Debug.drawRect("" + wall, wall);
+//        }
 
         Debug.log("walls", "" + walls.size);
         double maxPenetration = 0;
@@ -174,20 +184,22 @@ public class Player implements InputProcessor, Drawable {
             }
         }
         // if there is a collision, move the player to the edge of the wall
-        if (maxPenetration > 0) {
-            // a trick to avoid a bug that let player go through the wall when reversing
-            if (maxPenetration < SIZE) {
-                // get the direction from dx and dy
-                float angle = MathUtils.atan2Deg(dy, dx);
-                dx -= maxPenetration * MathUtils.cosDeg(angle);
-                dy -= maxPenetration * MathUtils.sinDeg(angle);
-            }
-
-            velocity = 0;
-        }
+//        if (maxPenetration > 0) {
+//            // a trick to avoid a bug that let player go through the wall when reversing
+//            if (maxPenetration < SIZE) {
+//                // get the direction from dx and dy
+//                float angle = MathUtils.atan2Deg(dy, dx);
+//                dx -= maxPenetration * MathUtils.cosDeg(angle);
+//                dy -= maxPenetration * MathUtils.sinDeg(angle);
+//            }
+//
+//            velocity = 0;
+//        }
         sprite.translate(dx, dy);
         collider.translate(dx, dy);
     }
+*/
+
     public void rotateBy(float rotation) {
 //        OrientedBox newCollider = collider.copy();
 //        newCollider.setDirection(direction + rotation - 90);
@@ -202,52 +214,63 @@ public class Player implements InputProcessor, Drawable {
         direction += rotation;
 
         collider.setDirection(direction - 90);
-        sprite.setRotation(direction + - 90);
+        sprite.setRotation(direction + -90);
 
     }
+
+    ArrayList<Body> walls = new ArrayList<>();
 
     @Override
     public void update(float delta) {
         Debug.log("Player X", "" + sprite.getX());
         Debug.log("Player Y", "" + sprite.getY());
 
+        direction = 0;
+
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            velocity += acceleration * delta;
-            if (velocity > maxMovementSpeed) {
-                velocity = maxMovementSpeed;
-            }
+            body.applyForceToCenter(
+                    new Vector2(0, acceleration), true);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            velocity -= deceleration * delta;
-            if (velocity < -maxBackwardSpeed) {
-                velocity = -maxBackwardSpeed;
-            }
+            body.applyForceToCenter(
+                    new Vector2(0, -deceleration), true);
         }
-        if(!Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.W)){
-            if(Math.abs(velocity) < 0.5) {
-                velocity = 0;
-            } else {
-                velocity -= (velocity > 0 ? deceleration : -deceleration) * friction * delta;
-            }
-        }
-        moveBy(MathUtils.cosDeg(direction) * velocity * delta,
-                MathUtils.sinDeg(direction) * velocity * delta);
+//        if (!Gdx.input.isKeyPressed(Input.Keys.S) && !Gdx.input.isKeyPressed(Input.Keys.W)) {
+//            if (Math.abs(velocity) < 0.5) {
+//                velocity = 0;
+//            } else {
+//                velocity -= (velocity > 0 ? deceleration : -deceleration) * friction * delta;
+//            }
+//        }
 
-        if (velocity > 0) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                rotateBy(maxRotationSpeed * delta);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                rotateBy(-maxRotationSpeed * delta);
-            }
-        } else if(velocity < 0) {
-            if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-                rotateBy(-maxRotationSpeed * delta);
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-                rotateBy(maxRotationSpeed * delta);
-            }
+        if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            body.applyForceToCenter(new Vector2(-acceleration, 0), true);
+
         }
+        if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            body.applyForceToCenter(new Vector2(acceleration, 0), true);
+
+        }
+
+        sprite.setPosition(body.getPosition().x - 3, body.getPosition().y - 3);
+        Array<Rectangle> wallsR;
+        wallsR = getWallsInPath();
+        for (Body wall : walls) {
+            GameScreen.world.destroyBody(wall);
+        }
+        walls.clear();
+
+        PolygonShape groundBox = new PolygonShape();
+        groundBox.setAsBox(.5f, .5f);
+        Body t;
+        for (Rectangle wallRect : wallsR) {
+            BodyDef wallDef = new BodyDef();
+            wallDef.position.set(wallRect.x + .5f, wallRect.y + .5f);
+            t = GameScreen.world.createBody(wallDef);
+            t.createFixture(groundBox, 0.0f);
+            walls.add(t);
+        }
+        groundBox.dispose();
 
 
         weaponL.update(delta,

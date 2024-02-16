@@ -7,6 +7,9 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Box2D;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.botshooter.characters.Biter;
 import com.mygdx.botshooter.characters.Player;
 import com.mygdx.botshooter.characters.weapons.Projectile;
@@ -18,6 +21,9 @@ public class GameScreen implements Screen {
     OrthographicCamera camera;
     SpriteBatch mainBatch;
     private Player player;
+    public static World world;
+    Box2DDebugRenderer box2DDebugRenderer;
+
     private MapController map;
 
     private static Vector2 v;
@@ -34,6 +40,9 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera(10, 10*h/w);
         Debug.setCamera(camera);
 
+        world = new World(new Vector2(0, 0), true);
+        box2DDebugRenderer = new Box2DDebugRenderer();
+
         map = new MapController(camera);
         player = new Player(map, camera);
         biter = new Biter(40,40);
@@ -48,6 +57,7 @@ public class GameScreen implements Screen {
 
         camera.position.set(player.getWorldOriginX(), player.getWorldOriginY(), 0);
         camera.update();
+        world.step(1/60f, 6, 2);
     }
 
     @Override
@@ -62,7 +72,7 @@ public class GameScreen implements Screen {
         player.render(mainBatch);
         biter.render(mainBatch);
         mainBatch.end();
-
+        box2DDebugRenderer.render(world, camera.combined);
         if(v != null){
             ShapeRenderer shapeRenderer = new ShapeRenderer();
             shapeRenderer.setProjectionMatrix(camera.combined);
