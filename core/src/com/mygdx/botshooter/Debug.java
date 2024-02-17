@@ -85,7 +85,7 @@ public class Debug {
         rects.put(tag, rect);
     }
 
-    public static void log(String tag, String info) {
+    public static void log(String tag, Object info) {
         Label label = logs.get(tag);
         if(label == null) {
             label = new Label("", style);
@@ -111,7 +111,7 @@ public class Debug {
     public static void render(float delta) {
         logger.log();
         timeBuffer += delta;
-        if (timeBuffer > 1) {
+        if (timeBuffer >= 1) {
             timeBuffer = 0;
             log("Memory", "" + (runtime.totalMemory() - runtime.freeMemory()) / 1048576 + "MB / "+ runtime.maxMemory() / 1048576 + "MB");
             log(FPS_TAG, "" + (int) (1 / delta));

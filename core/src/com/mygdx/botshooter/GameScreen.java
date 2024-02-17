@@ -7,12 +7,10 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2D;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.botshooter.characters.Biter;
 import com.mygdx.botshooter.characters.Player;
-import com.mygdx.botshooter.characters.weapons.Projectile;
 import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
 import com.mygdx.botshooter.map.MapController;
 
@@ -51,13 +49,16 @@ public class GameScreen implements Screen {
 
     }
     private void update(float delta){
+
         ProjectilesUtil.updateProjectiles(delta);
-        player.update(delta);
         biter.update(delta);
 
-        camera.position.set(player.getWorldOriginX(), player.getWorldOriginY(), 0);
+        world.step(Constants.WORLD_TIME_STEP, 6, 2);
+        player.update(delta);
+
+        Vector2 playerPos = player.getWorldCenter();
+        camera.position.set(playerPos.x, playerPos.y, 0);
         camera.update();
-        world.step(1/60f, 6, 2);
     }
 
     @Override
@@ -73,14 +74,6 @@ public class GameScreen implements Screen {
         biter.render(mainBatch);
         mainBatch.end();
         box2DDebugRenderer.render(world, camera.combined);
-        if(v != null){
-            ShapeRenderer shapeRenderer = new ShapeRenderer();
-            shapeRenderer.setProjectionMatrix(camera.combined);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-            shapeRenderer.setColor(Color.RED);
-            shapeRenderer.circle(v.x, v.y, 0.1f, 90);
-            shapeRenderer.end();
-        }
     }
 
     @Override
