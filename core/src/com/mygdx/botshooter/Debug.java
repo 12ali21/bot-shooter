@@ -23,7 +23,6 @@ public class Debug {
     private static Label.LabelStyle style;
     private static float timeBuffer = 0;
     private static GLProfiler profiler;
-    private static FPSLogger logger;
     private static HashMap<String, Label> logs;
     private static HashMap<String, Rectangle> rects;
     private static Runtime runtime;
@@ -33,11 +32,10 @@ public class Debug {
     private static final String DRAWS_TAG = "draws";
     private static Camera gameCamera;
     private static ShapeRenderer shapeRenderer;
-
+    private static int frames;
 
 
     static {
-        logger = new FPSLogger();
         runtime = Runtime.getRuntime();
 
         profiler = new GLProfiler(Gdx.graphics);
@@ -109,12 +107,13 @@ public class Debug {
     }
 
     public static void render(float delta) {
-        logger.log();
+        frames++;
         timeBuffer += delta;
         if (timeBuffer >= 1) {
-            timeBuffer = 0;
             log("Memory", "" + (runtime.totalMemory() - runtime.freeMemory()) / 1048576 + "MB / "+ runtime.maxMemory() / 1048576 + "MB");
-            log(FPS_TAG, "" + (int) (1 / delta));
+            log(FPS_TAG, "" + frames / timeBuffer);
+            timeBuffer = 0;
+            frames = 0;
             log(BINDS_TAG, "" + profiler.getTextureBindings());
             log(DRAWS_TAG, "" + profiler.getDrawCalls());
             profiler.reset();

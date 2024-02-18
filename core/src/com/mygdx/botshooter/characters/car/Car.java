@@ -15,8 +15,8 @@ public class Car {
 
     private Tire[] tires = new Tire[4];
     private RevoluteJoint frontLeftJoint, frontRightJoint;
-    private float lockAngle = 30 * MathUtils.degreesToRadians;
-    private float turnSpeed = 280 * MathUtils.degreesToRadians;
+    private float lockAngle = 20 * MathUtils.degreesToRadians;
+    private float turnSpeed = 60 * MathUtils.degreesToRadians;
 
     public Car(World world, Rectangle rect) {
         BodyDef bodyDef = new BodyDef();
@@ -36,8 +36,8 @@ public class Car {
 
         shape.set(vertices);
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.friction = 0.1f;
-        fixtureDef.restitution = 0.05f;
+        fixtureDef.friction = 0;
+        fixtureDef.restitution = 0;
         fixtureDef.density = 1f;
         fixtureDef.shape = shape;
 
@@ -85,6 +85,8 @@ public class Car {
         jointDef.enableLimit = true;
         jointDef.lowerAngle = 0;
         jointDef.upperAngle = 0;
+
+        jointDef.collideConnected = false;
         // joint anchor in tire is in center
         jointDef.localAnchorB.setZero();
 
@@ -173,13 +175,16 @@ public class Car {
         if (turn > 0) turnRight();
         else if (turn < 0) turnLeft();
         else notTurn();
+        updateFriction();
 
         if (drive > 0) driveForward();
         else if (drive < 0) driveBackward();
 
-        updateFriction();
 
-        Debug.log("Speed", body.getLinearVelocity().len());
+        Vector2 v = body.getWorldVector(new Vector2(0, 1)).cpy();
+        Debug.log("Forward Speed", v.dot(body.getLinearVelocity()));
+        v = body.getWorldVector(new Vector2(1, 0)).cpy();
+        Debug.log("Lateral Speed", v.dot(body.getLinearVelocity()));
     }
 
     public Vector2 getPosition() {

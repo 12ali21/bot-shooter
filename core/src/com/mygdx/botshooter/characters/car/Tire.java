@@ -11,7 +11,7 @@ public class Tire {
 
     private final float maxForwardSpeed = 40;
     private final float maxBackwardSpeed = -20;
-    private final float maxDriveForce = 400;
+    private final float maxDriveForce = 800;
 
     private float currentSpeed = 0;
     private float mass;
@@ -31,9 +31,10 @@ public class Tire {
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width, height);
-        body.createFixture(shape, 1);
-
+        body.createFixture(shape, 30);
         shape.dispose();
+        System.out.println(body.getMass());
+
         body.setUserData(this);
         this.mass += body.getMass();
     }
@@ -63,7 +64,7 @@ public class Tire {
 
         Vector2 forwardVelocity = getForwardVelocity();
         float speed = forwardVelocity.len();
-        float dragForceMag = .1f * speed + mass * 0.4f;
+        float dragForceMag = .3f * speed + mass * 0.6f;
         body.applyForceToCenter(forwardVelocity.scl(-dragForceMag), true);
 
     }

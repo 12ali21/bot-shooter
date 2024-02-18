@@ -39,7 +39,7 @@ public class GameScreen implements Screen {
         Debug.setCamera(camera);
 
         world = new World(new Vector2(0, 0), true);
-        box2DDebugRenderer = new Box2DDebugRenderer();
+        box2DDebugRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
 
         map = new MapController(camera);
         player = new Player(map, camera);
