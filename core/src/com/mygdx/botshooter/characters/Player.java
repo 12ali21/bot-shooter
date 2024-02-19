@@ -16,6 +16,8 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.*;
 import com.mygdx.botshooter.characters.car.Car;
 import com.mygdx.botshooter.characters.car.ControlAction;
+import com.mygdx.botshooter.characters.car.FourWheelCar;
+import com.mygdx.botshooter.characters.car.TrackCar;
 import com.mygdx.botshooter.characters.weapons.MiniGun;
 import com.mygdx.botshooter.characters.weapons.Weapon;
 import com.mygdx.botshooter.map.MapController;
@@ -47,7 +49,7 @@ public class Player implements InputProcessor, Drawable {
 
         int posX = 100, posY = 10;
 
-        Texture spriteTexture = new Texture("player_3.png");
+        Texture spriteTexture = new Texture("player_5.png");
         sprite = new Sprite(spriteTexture);
         // position in world
         sprite.setPosition(posX, posY);
@@ -58,7 +60,7 @@ public class Player implements InputProcessor, Drawable {
         assignRightWeapon(new MiniGun(camera, new Vector2(0.9f, 1.2f)));
         assignLeftWeapon(new MiniGun(camera, new Vector2(-0.9f, 1.2f)));
 
-        body = new Car(GameScreen.world, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
+        body = new TrackCar(GameScreen.world, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
     }
 
 

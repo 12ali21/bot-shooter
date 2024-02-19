@@ -9,20 +9,29 @@ import com.badlogic.gdx.physics.box2d.World;
 public class Tire {
     public Body body;
 
-    private final float maxForwardSpeed = 40;
-    private final float maxBackwardSpeed = -20;
-    private final float maxDriveForce = 800;
+    private float maxForwardSpeed;
+    private float maxBackwardSpeed;
+    private float maxDriveForce;
+
+    private float friction;
+    private float angularFriction;
+    private float airDrag;
 
     private float currentSpeed = 0;
     private float mass;
+    private float width;
+    private float height;
 
     /**
      * creates a new tire in world
      * @param world physics world
      * @param mass  mass of the object on top of this tire
      */
-    public Tire(World world, float mass, float width, float height) {
+    public Tire(World world, float mass, float width, float height, float density) {
         this.mass = mass;
+        this.width = width;
+        this.height = height;
+
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(100, 2);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -31,12 +40,16 @@ public class Tire {
 
         PolygonShape shape = new PolygonShape();
         shape.setAsBox(width, height);
-        body.createFixture(shape, 30);
+        body.createFixture(shape, density);
         shape.dispose();
         System.out.println(body.getMass());
 
         body.setUserData(this);
         this.mass += body.getMass();
+    }
+
+    public Tire(World world, float mass, float width, float height) {
+        this(world, mass, width, height, 30);
     }
 
     private Vector2 getLateralVelocity() {
@@ -60,11 +73,11 @@ public class Tire {
         Vector2 lateralImpulse = getLateralVelocity().scl(-body.getMass());
         body.applyLinearImpulse(lateralImpulse, body.getWorldCenter(), true);
 
-        body.applyAngularImpulse(0.1f * body.getInertia() * -body.getAngularVelocity(), true);
+        body.applyAngularImpulse(angularFriction * body.getInertia() * -body.getAngularVelocity(), true);
 
         Vector2 forwardVelocity = getForwardVelocity();
         float speed = forwardVelocity.len();
-        float dragForceMag = .3f * speed + mass * 0.6f;
+        float dragForceMag = airDrag * speed + mass * friction;
         body.applyForceToCenter(forwardVelocity.scl(-dragForceMag), true);
 
     }
@@ -93,5 +106,27 @@ public class Tire {
         body.applyTorque(angle, true);
     }
 
+    public void setMaxForwardSpeed(float maxForwardSpeed) {
+        this.maxForwardSpeed = maxForwardSpeed;
+    }
 
+    public void setMaxBackwardSpeed(float maxBackwardSpeed) {
+        this.maxBackwardSpeed = maxBackwardSpeed;
+    }
+
+    public void setMaxDriveForce(float maxDriveForce) {
+        this.maxDriveForce = maxDriveForce;
+    }
+
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+
+    public void setAngularFriction(float angularFriction) {
+        this.angularFriction = angularFriction;
+    }
+
+    public void setAirDrag(float airDrag) {
+        this.airDrag = airDrag;
+    }
 }

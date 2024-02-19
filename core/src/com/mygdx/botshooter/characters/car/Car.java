@@ -10,74 +10,20 @@ import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.Constants;
 import com.mygdx.botshooter.Debug;
 
-public class Car {
-    public Body body;
+public abstract class Car {
+    protected Body body;
 
-    private Tire[] tires = new Tire[4];
-    private RevoluteJoint frontLeftJoint, frontRightJoint;
-    private float lockAngle = 20 * MathUtils.degreesToRadians;
-    private float turnSpeed = 60 * MathUtils.degreesToRadians;
+    protected Tire[] tires;
+    protected RevoluteJoint frontLeftJoint, frontRightJoint;
 
     public Car(World world, Rectangle rect) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(rect.x, rect.y);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         body = world.createBody(bodyDef);
-
-        PolygonShape shape = new PolygonShape();
-        Vector2[] vertices = new Vector2[]{
-                new Vector2(-rect.width / 2, -rect.height / 2 - 0.2f),
-                new Vector2(-rect.width / 2, rect.height / 2 - 1.4f),
-                new Vector2(-0.2f, rect.height / 2),
-                new Vector2(0.2f, rect.height / 2),
-                new Vector2(rect.width / 2, rect.height / 2 - 1.4f),
-                new Vector2(rect.width / 2, -rect.height / 2 - 0.2f)
-        };
-
-        shape.set(vertices);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.friction = 0;
-        fixtureDef.restitution = 0;
-        fixtureDef.density = 1f;
-        fixtureDef.shape = shape;
-
-        body.createFixture(fixtureDef);
-        shape.dispose();
-
-        RevoluteJointDef jointDef = new RevoluteJointDef();
-        jointDef.bodyA = body;
-
-        float wheelWidth = 0.2f;
-        float wheelHeight = 0.5f;
-
-
-        // front left joint
-        frontLeftJoint = (RevoluteJoint) createTireJoint(world,
-                tires[0] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
-                -rect.width / 2,
-                rect.height / 2 - 2.2f);
-
-        // front right joint
-        frontRightJoint = (RevoluteJoint) createTireJoint(world,
-                tires[1] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
-                rect.width / 2,
-                rect.height / 2 - 2.2f);
-
-        // back left joint
-        createTireJoint(world,
-                tires[2] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
-                -rect.width / 2,
-                -rect.height / 2 + .6f);
-
-        // back right joint
-        createTireJoint(world,
-                tires[3] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
-                rect.width / 2,
-                -rect.height / 2 + .6f);
-
     }
 
-    private Joint createTireJoint(World world, Tire tire, float x, float y) {
+    protected Joint createTireJoint(World world, Tire tire, float x, float y) {
         RevoluteJointDef jointDef = new RevoluteJointDef();
         jointDef.bodyA = body;
 
@@ -102,90 +48,7 @@ public class Car {
         }
     }
 
-    private void driveForward() {
-        for (int i = 0; i < 4; i++) {
-            tires[i].driveForward();
-        }
-    }
-
-    private void driveBackward() {
-        for (int i = 0; i < 4; i++) {
-            tires[i].driveBackward();
-        }
-    }
-
-    private void turnRight() {
-        float currAngle = frontLeftJoint.getJointAngle();
-        float newAngle = currAngle + turnSpeed * Constants.WORLD_TIME_STEP;
-        newAngle = Math.min(newAngle, lockAngle);
-        frontLeftJoint.setLimits(newAngle, newAngle);
-        frontRightJoint.setLimits(newAngle, newAngle);
-    }
-
-    private void turnLeft() {
-        float currAngle = frontLeftJoint.getJointAngle();
-        float newAngle = currAngle - turnSpeed * Constants.WORLD_TIME_STEP;
-        newAngle = Math.max(newAngle, -lockAngle);
-        frontLeftJoint.setLimits(newAngle, newAngle);
-        frontRightJoint.setLimits(newAngle, newAngle);
-    }
-
-    private void notTurn() {
-
-        float currAngle = frontLeftJoint.getJointAngle();
-        float newAngle = currAngle;
-
-        if (newAngle < 0) newAngle += turnSpeed * Constants.WORLD_TIME_STEP;
-        else if (newAngle > 0) newAngle -= turnSpeed * Constants.WORLD_TIME_STEP;
-        else return;
-
-        // check if currAngle and newAngle have different signs
-        if (currAngle * newAngle > 0) {
-            frontLeftJoint.setLimits(newAngle, newAngle);
-            frontRightJoint.setLimits(newAngle, newAngle);
-        } else { // the signs are different, so we are close to the default rotation
-            frontLeftJoint.setLimits(0, 0);
-            frontRightJoint.setLimits(0, 0);
-        }
-    }
-
-
-    public void updateDrive(Array<ControlAction> actions) {
-        int drive = 0;
-        int turn = 0;
-
-        for (ControlAction action : actions) {
-            switch (action) {
-                case DRIVE_FORWARD:
-                    drive++;
-                    break;
-                case DRIVE_BACKWARD:
-                    drive--;
-                    break;
-                case TURN_LEFT:
-                    turn++;
-                    break;
-                case TURN_RIGHT:
-                    turn--;
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (turn > 0) turnRight();
-        else if (turn < 0) turnLeft();
-        else notTurn();
-        updateFriction();
-
-        if (drive > 0) driveForward();
-        else if (drive < 0) driveBackward();
-
-
-        Vector2 v = body.getWorldVector(new Vector2(0, 1)).cpy();
-        Debug.log("Forward Speed", v.dot(body.getLinearVelocity()));
-        v = body.getWorldVector(new Vector2(1, 0)).cpy();
-        Debug.log("Lateral Speed", v.dot(body.getLinearVelocity()));
-    }
+    public abstract void updateDrive(Array<ControlAction> actions);
 
     public Vector2 getPosition() {
         return body.getPosition();
