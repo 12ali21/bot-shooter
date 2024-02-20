@@ -1,6 +1,7 @@
 package com.mygdx.botshooter;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -26,8 +27,10 @@ public class GameScreen implements Screen {
 
     private static Vector2 v;
     private Biter biter;
-    public final float FOV = 128;
-    public final float ASPECT_RATIO = 1920f/1080f;
+    public final float ASPECT_RATIO = 1920f / 1080f;
+
+
+    ScreenInputAdapter inputAdapter;
 
     @Override
     public void show() {
@@ -35,7 +38,7 @@ public class GameScreen implements Screen {
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
-        camera = new OrthographicCamera(10, 10*h/w);
+        camera = new OrthographicCamera(10, 10 * h / w);
         Debug.setCamera(camera);
 
         world = new World(new Vector2(0, 0), true);
@@ -43,12 +46,16 @@ public class GameScreen implements Screen {
 
         map = new MapController(camera);
         player = new Player(map, camera);
-        biter = new Biter(40,40);
+        biter = new Biter(40, 40);
 
-        Gdx.input.setInputProcessor(player);
+        inputAdapter = new ScreenInputAdapter();
+
+        InputMultiplexer inputMultiplexer = new InputMultiplexer(inputAdapter, player);
+        Gdx.input.setInputProcessor(inputMultiplexer);
 
     }
-    private void update(float delta){
+
+    private void update(float delta) {
 
         ProjectilesUtil.updateProjectiles(delta);
         biter.update(delta);
@@ -58,8 +65,10 @@ public class GameScreen implements Screen {
 
         Vector2 playerPos = player.getWorldCenter();
         camera.position.set(playerPos.x, playerPos.y, 0);
+        if (inputAdapter.isFOVChanged()) updateFOV();
         camera.update();
     }
+
 
     @Override
     public void render(float delta) {
@@ -78,11 +87,15 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.viewportWidth = FOV;
-        camera.viewportHeight = FOV / ASPECT_RATIO;
+        updateFOV();
     }
 
-    public static void test(Vector2 v){
+    private void updateFOV() {
+        camera.viewportWidth = inputAdapter.getFOV();
+        camera.viewportHeight = inputAdapter.getFOV() / ASPECT_RATIO;
+    }
+
+    public static void test(Vector2 v) {
         GameScreen.v = v;
     }
 
