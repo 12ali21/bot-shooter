@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
@@ -30,12 +31,14 @@ public class Player implements InputProcessor, Drawable {
     private Weapon weaponR;
     private Weapon weaponL;
 
+    private TrackCarAnimator animator;
+
     private boolean collision = true;
 
     private MapController map;
 
     OrthographicCamera camera;
-    Car body;
+    TrackCar body;
 
     Array<Body> walls = new Array<>(false, 16);
     Array<ControlAction> actions = new Array<>(false, 4);
@@ -49,8 +52,9 @@ public class Player implements InputProcessor, Drawable {
 
         int posX = 100, posY = 10;
 
-        Texture spriteTexture = new Texture("player_5.png");
-        sprite = new Sprite(spriteTexture);
+        animator = new TrackCarAnimator("player/driller_default");
+
+        sprite = new Sprite(animator.getIdle());
         // position in world
         sprite.setPosition(posX, posY);
         // center position with respect to the player
@@ -61,6 +65,7 @@ public class Player implements InputProcessor, Drawable {
         assignLeftWeapon(new MiniGun(camera, new Vector2(-0.9f, 1.2f)));
 
         body = new TrackCar(GameScreen.world, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
+        TextureRegion region = new TextureRegion();
     }
 
 
@@ -123,6 +128,10 @@ public class Player implements InputProcessor, Drawable {
             actions.add(ControlAction.TURN_RIGHT);
         }
 
+        animator.animateLeftTrack(body.getLeftTrackSpeed());
+        animator.animateRightTrack(body.getRightTrackSpeed());
+
+        sprite.setTexture(animator.getFrame(delta));
         sprite.setCenter(body.getPosition().x, body.getPosition().y);
         sprite.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
 

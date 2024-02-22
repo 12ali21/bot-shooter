@@ -72,13 +72,13 @@ public class FourWheelCar extends Car{
 
     private void driveForward() {
         for (int i = 0; i < 4; i++) {
-            tires[i].driveForward();
+            tires[i].update(ControlAction.DRIVE_FORWARD);
         }
     }
 
     private void driveBackward() {
         for (int i = 0; i < 4; i++) {
-            tires[i].driveBackward();
+            tires[i].update(ControlAction.DRIVE_BACKWARD);
         }
     }
 

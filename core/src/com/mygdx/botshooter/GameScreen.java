@@ -56,7 +56,6 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
-
         ProjectilesUtil.updateProjectiles(delta);
         biter.update(delta);
 
@@ -73,7 +72,6 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         update(delta);
-
         mainBatch.begin();
         // Render map
         map.render();

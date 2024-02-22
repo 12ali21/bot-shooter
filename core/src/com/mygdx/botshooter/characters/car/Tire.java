@@ -24,6 +24,7 @@ public class Tire {
 
     /**
      * creates a new tire in world
+     *
      * @param world physics world
      * @param mass  mass of the object on top of this tire
      */
@@ -60,6 +61,7 @@ public class Tire {
         rightNormal.scl(rightNormal.dot(body.getLinearVelocity()));
         return rightNormal;
     }
+
     private Vector2 getForwardVelocity() {
         // get the vector from the center to the top of the tire in world
         Vector2 upNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
@@ -67,6 +69,14 @@ public class Tire {
         // projection of linear velocity on up facing vector
         upNormal.scl(upNormal.dot(body.getLinearVelocity()));
         return upNormal;
+    }
+
+    /**
+     * @return the current forward speed. if it is moving in reverse the current speed will return negative
+     */
+    public float getForwardSpeed() {
+        if(currentSpeed > -0.1f && currentSpeed < 0.1f) return 0;
+        return currentSpeed;
     }
 
     public void updateFriction() {
@@ -82,24 +92,25 @@ public class Tire {
 
     }
 
-    public void driveForward() {
-        Vector2 forwardNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
-        currentSpeed = getForwardVelocity().dot(forwardNormal);
-
-        if(currentSpeed > maxForwardSpeed) {
+    private void driveForward(Vector2 forwardNormal) {
+        if (currentSpeed > maxForwardSpeed) {
             return;
         }
         body.applyForceToCenter(forwardNormal.scl(maxDriveForce), true);
     }
 
-    public void driveBackward() {
-        Vector2 forwardNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
-        currentSpeed = getForwardVelocity().dot(forwardNormal);
-
+    private void driveBackward(Vector2 forwardNormal) {
         if (currentSpeed < maxBackwardSpeed) {
             return;
         }
         body.applyForceToCenter(forwardNormal.scl(-maxDriveForce), true);
+    }
+
+    public void update(ControlAction action) {
+        Vector2 forwardNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
+        currentSpeed = getForwardVelocity().dot(forwardNormal);
+        if(action == ControlAction.DRIVE_FORWARD) driveForward(forwardNormal);
+        else if(action == ControlAction.DRIVE_BACKWARD) driveBackward(forwardNormal);
     }
 
     public void turn(float angle) {

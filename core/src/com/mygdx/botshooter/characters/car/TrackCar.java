@@ -10,6 +10,8 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 
 public class TrackCar extends Car {
+    private float tmp;
+
     public TrackCar(World world, Rectangle rect) {
         super(world, rect);
         tires = new Tire[2];
@@ -66,6 +68,9 @@ public class TrackCar extends Car {
     @Override
     public void updateDrive(Array<ControlAction> actions) {
         int right = 0, left = 0;
+
+        ControlAction rightAction = ControlAction.DO_NOTHING;
+        ControlAction leftAction = ControlAction.DO_NOTHING;
         for (ControlAction action : actions) {
             switch (action) {
                 case DRIVE_FORWARD:
@@ -85,14 +90,25 @@ public class TrackCar extends Car {
                     left++;
                     break;
             }
-
-            if (right > 0) tires[1].driveForward();
-            else if (right < 0) tires[1].driveBackward();
-
-            if (left > 0) tires[0].driveForward();
-            else if (left < 0) tires[0].driveBackward();
         }
 
+        if (right > 0) rightAction = ControlAction.DRIVE_FORWARD;
+        else if (right < 0) rightAction = ControlAction.DRIVE_BACKWARD;
+
+        if (left > 0) leftAction = ControlAction.DRIVE_FORWARD;
+        else if (left < 0) leftAction = ControlAction.DRIVE_BACKWARD;
+
+        tires[1].update(rightAction);
+        tires[0].update(leftAction);
+
         updateFriction();
+    }
+
+    public float getRightTrackSpeed() {
+        return tires[1].getForwardSpeed();
+    }
+
+    public float getLeftTrackSpeed() {
+        return tires[0].getForwardSpeed();
     }
 }
