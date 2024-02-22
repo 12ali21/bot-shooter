@@ -13,7 +13,7 @@ public class TrackCar extends Car {
     private float tmp;
 
     public TrackCar(World world, Rectangle rect) {
-        super(world, rect);
+        super(world, rect, 10);
         tires = new Tire[2];
 
         PolygonShape shape = new PolygonShape();
@@ -102,6 +102,7 @@ public class TrackCar extends Car {
         tires[0].update(leftAction);
 
         updateFriction();
+        update();
     }
 
     public float getRightTrackSpeed() {

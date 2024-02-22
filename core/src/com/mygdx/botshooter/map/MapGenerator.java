@@ -44,21 +44,29 @@ public class MapGenerator {
         groundLayer = new TiledMapTileLayer(width, height, TILE_SIZE, TILE_SIZE);
         groundLayer.setName(Renderer.GROUND_LAYER);
         float noise;
+
+
+        Cell mountainCell = new SolidCell();
+        mountainCell.setTile(new StaticTiledMapTile(rockyMountain));
+
+        Cell[] groundCells = new Cell[] {
+                new Cell().setTile(new StaticTiledMapTile(gravelGround[0][0])),
+                new Cell().setTile(new StaticTiledMapTile(gravelGround[0][1])),
+                new Cell().setTile(new StaticTiledMapTile(gravelGround[1][0])),
+                new Cell().setTile(new StaticTiledMapTile(gravelGround[1][1]))
+        };
+
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 noise = OpenSimplex2S.noise2(seed, x * SCALE, y * SCALE);
                 // fill with mountain wall
                 if ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ||
                         (noise + 1) / 2f > 0.6) {
-                    Cell cell = new SolidCell();
-                    cell.setTile(new StaticTiledMapTile(rockyMountain));
-                    mountainLayer.setCell(x, y, cell);
+                    mountainLayer.setCell(x, y, mountainCell);
                 }
                 // fill the ground with gravel
                 else {
-                    Cell cell = new Cell();
-                    cell.setTile(new StaticTiledMapTile(getRandomRegion(gravelGround, random)));
-                    groundLayer.setCell(x, y, cell);
+                    groundLayer.setCell(x, y, getRandomCell(groundCells, random));
                 }
             }
         }
@@ -68,11 +76,10 @@ public class MapGenerator {
         renderer = new Renderer(map, 1, camera);
     }
 
-    // returns a random region of a texture
-    TextureRegion getRandomRegion(TextureRegion[][] regions, Random random) {
-        int pos = random.nextInt(4);
-        int x = pos / regions.length;
-        int y = pos % regions.length;
-        return regions[x][y];
+    // returns a random cell of a cell array
+    Cell getRandomCell(Cell[] cells, Random random) {
+        int pos = random.nextInt(cells.length);
+        return cells[pos];
     }
+
 }

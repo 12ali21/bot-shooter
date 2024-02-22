@@ -9,14 +9,14 @@ import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.Constants;
 import com.mygdx.botshooter.Debug;
+import com.mygdx.botshooter.characters.DynamicObject;
 
-public abstract class Car {
-    protected Body body;
-
+public abstract class Car extends DynamicObject {
     protected Tire[] tires;
     protected RevoluteJoint frontLeftJoint, frontRightJoint;
 
-    public Car(World world, Rectangle rect) {
+    public Car(World world, Rectangle rect, float boundsSize) {
+        super(boundsSize);
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(rect.x, rect.y);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
@@ -49,7 +49,6 @@ public abstract class Car {
     }
 
     public abstract void updateDrive(Array<ControlAction> actions);
-
     public Vector2 getPosition() {
         return body.getPosition();
     }

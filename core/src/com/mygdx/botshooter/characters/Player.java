@@ -40,7 +40,6 @@ public class Player implements InputProcessor, Drawable {
     OrthographicCamera camera;
     TrackCar body;
 
-    Array<Body> walls = new Array<>(false, 16);
     Array<ControlAction> actions = new Array<>(false, 4);
 
     private Vector3 tmpVector3 = new Vector3();
@@ -88,23 +87,6 @@ public class Player implements InputProcessor, Drawable {
         sprite.draw(batch);
     }
 
-    private Array<Rectangle> getWalls(Rectangle bounds) {
-        int sX = (int) bounds.x;
-        int eX = (int) (Math.ceil(bounds.x + bounds.width));
-        int sY = (int) bounds.y;
-        int eY = (int) (Math.ceil(bounds.y + bounds.height));
-        Debug.drawRect("Bounds", bounds);
-
-        return MapController.getWalls(sX, eX, sY, eY);
-    }
-
-    private Array<Rectangle> getWallsInPath() {
-        Rectangle bounds = new Rectangle(body.getPosition().x - 6, body.getPosition().y - 6, SIZE * 2, SIZE * 2);
-//        Debug.log("dx, dy", "" + dx + ", " + dy);
-
-        return getWalls(bounds);
-    }
-
 
     @Override
     public void update(float delta) {
@@ -128,33 +110,20 @@ public class Player implements InputProcessor, Drawable {
             actions.add(ControlAction.TURN_RIGHT);
         }
 
+        if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            animator.animateDrilling(1);
+        } else {
+            animator.animateDrilling(0);
+        }
+
         animator.animateLeftTrack(body.getLeftTrackSpeed());
         animator.animateRightTrack(body.getRightTrackSpeed());
 
-//        sprite.setTexture(animator.getFrame(delta));
+        sprite.setTexture(animator.getFrame(delta));
         sprite.setCenter(body.getPosition().x, body.getPosition().y);
         sprite.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
 
         body.updateDrive(actions);
-
-        Array<Rectangle> wallsR;
-        wallsR = getWallsInPath();
-        for (Body wall : walls) {
-            GameScreen.world.destroyBody(wall);
-        }
-        walls.clear();
-
-        PolygonShape groundBox = new PolygonShape();
-        groundBox.setAsBox(.5f, .5f);
-        Body t;
-        for (Rectangle wallRect : wallsR) {
-            BodyDef wallDef = new BodyDef();
-            wallDef.position.set(wallRect.x + .5f, wallRect.y + .5f);
-            t = GameScreen.world.createBody(wallDef);
-            t.createFixture(groundBox, 0.0f);
-            walls.add(t);
-        }
-        groundBox.dispose();
 
         weaponL.update(delta,
                 sprite.getX() + sprite.getOriginX(),

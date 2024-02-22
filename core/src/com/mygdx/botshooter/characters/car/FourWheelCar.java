@@ -18,7 +18,7 @@ public class FourWheelCar extends Car{
     protected float turnSpeed = 120 * MathUtils.degreesToRadians;
 
     public FourWheelCar(World world, Rectangle rect) {
-        super(world, rect);
+        super(world, rect, 10f);
         tires = new Tire[4];
 
         PolygonShape shape = new PolygonShape();
@@ -153,5 +153,6 @@ public class FourWheelCar extends Car{
         Debug.log("Forward Speed", v.dot(body.getLinearVelocity()));
         v = body.getWorldVector(new Vector2(1, 0)).cpy();
         Debug.log("Lateral Speed", v.dot(body.getLinearVelocity()));
+        update();
     }
 }
