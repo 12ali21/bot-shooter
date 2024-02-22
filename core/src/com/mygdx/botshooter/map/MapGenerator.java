@@ -75,8 +75,4 @@ public class MapGenerator {
         int y = pos % regions.length;
         return regions[x][y];
     }
-    public void render() {
-        renderer.setView(camera);
-        renderer.render();
-    }
 }

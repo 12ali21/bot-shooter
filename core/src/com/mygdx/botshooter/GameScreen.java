@@ -73,12 +73,16 @@ public class GameScreen implements Screen {
     public void render(float delta) {
         update(delta);
         mainBatch.begin();
-        // Render map
-        map.render();
+        // Render ground layer
+        map.renderGround(mainBatch);
+
         // Render game objects
         ProjectilesUtil.drawProjectiles(mainBatch);
         player.render(mainBatch);
         biter.render(mainBatch);
+
+        // Render mountain layer
+        map.renderMountain(mainBatch);
         mainBatch.end();
         box2DDebugRenderer.render(world, camera.combined);
     }

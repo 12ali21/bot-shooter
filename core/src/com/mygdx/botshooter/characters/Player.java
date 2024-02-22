@@ -131,7 +131,7 @@ public class Player implements InputProcessor, Drawable {
         animator.animateLeftTrack(body.getLeftTrackSpeed());
         animator.animateRightTrack(body.getRightTrackSpeed());
 
-        sprite.setTexture(animator.getFrame(delta));
+//        sprite.setTexture(animator.getFrame(delta));
         sprite.setCenter(body.getPosition().x, body.getPosition().y);
         sprite.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
 

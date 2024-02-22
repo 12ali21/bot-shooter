@@ -87,9 +87,6 @@ public class TrackCarAnimator {
         }
         if (leftTrack.speed != 0) {
             leftTrack.addDelta(delta);
-            Debug.log("delta", delta);
-            Debug.log("state time left", leftTrack.stateTime);
-            Debug.log("left speed", leftTrack.speed);
 
             drawOnPixmap(leftTrack.animation.getKeyFrame(leftTrack.stateTime));
 //            setAnimationSpeed(leftTrack.animation, leftTrack.speed);
@@ -121,6 +118,7 @@ public class TrackCarAnimator {
         drill.speed = speed;
     }
 
+    //TODO: cache pix-maps for increased performance
     private void drawOnPixmap(TextureRegion region) {
         tmpTexture = region.getTexture();
         tmpTexture.getTextureData().prepare();
