@@ -3,27 +3,19 @@ package com.mygdx.botshooter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
-import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.botshooter.characters.Biter;
 import com.mygdx.botshooter.characters.Player;
 import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
-import com.mygdx.botshooter.map.MapController;
 
 public class GameScreen implements Screen {
 
     OrthographicCamera camera;
     SpriteBatch mainBatch;
     private Player player;
-    public static World world;
-    Box2DDebugRenderer box2DDebugRenderer;
-
-    private MapController map;
+    GameWorld gameWorld;
 
     private static Vector2 v;
     private Biter biter;
@@ -41,11 +33,10 @@ public class GameScreen implements Screen {
         camera = new OrthographicCamera(10, 10 * h / w);
         Debug.setCamera(camera);
 
-        world = new World(new Vector2(0, 0), true);
-        box2DDebugRenderer = new Box2DDebugRenderer(true, true, false, true, true, true);
+        gameWorld = new GameWorld(camera);
 
-        map = new MapController(camera);
-        player = new Player(map, camera);
+
+        player = new Player(gameWorld, camera);
         biter = new Biter(40, 40);
 
         inputAdapter = new ScreenInputAdapter();
@@ -56,12 +47,15 @@ public class GameScreen implements Screen {
     }
 
     private void update(float delta) {
+        // update entities
         ProjectilesUtil.updateProjectiles(delta);
         biter.update(delta);
-
-        world.step(Constants.WORLD_TIME_STEP, 6, 2);
         player.update(delta);
 
+        // update world physics
+        gameWorld.update();
+
+        // center camera on player
         Vector2 playerPos = player.getWorldCenter();
         camera.position.set(playerPos.x, playerPos.y, 0);
         if (inputAdapter.isFOVChanged()) updateFOV();
@@ -72,9 +66,10 @@ public class GameScreen implements Screen {
     @Override
     public void render(float delta) {
         update(delta);
+        mainBatch.setProjectionMatrix(camera.combined);
         mainBatch.begin();
         // Render ground layer
-        map.renderGround(mainBatch);
+        gameWorld.renderGround(mainBatch);
 
         // Render game objects
         ProjectilesUtil.drawProjectiles(mainBatch);
@@ -82,14 +77,17 @@ public class GameScreen implements Screen {
         biter.render(mainBatch);
 
         // Render mountain layer
-        map.renderMountain(mainBatch);
+        gameWorld.renderMountain(mainBatch);
         mainBatch.end();
-        box2DDebugRenderer.render(world, camera.combined);
+
+        // render world logs and debugs
+        gameWorld.debug(camera, delta);
     }
 
     @Override
     public void resize(int width, int height) {
         updateFOV();
+        Debug.resize(width, height);
     }
 
     private void updateFOV() {

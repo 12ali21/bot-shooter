@@ -8,12 +8,13 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.botshooter.GameWorld;
 
 public class TrackCar extends Car {
     private float tmp;
 
-    public TrackCar(World world, Rectangle rect) {
-        super(world, rect, 10);
+    public TrackCar(GameWorld gameWorld, Rectangle rect) {
+        super(gameWorld, rect, 10);
         tires = new Tire[2];
 
         PolygonShape shape = new PolygonShape();
@@ -39,12 +40,13 @@ public class TrackCar extends Car {
         float wheelWidth = 0.1f;
         float wheelHeight = 2f;
 
-
+        tires[0] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight, 80);
+        tires[1] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight, 80);
         // front left joint
-        frontLeftJoint = (RevoluteJoint) createTireJoint(world, tires[0] = new Tire(world, body.getMass(), wheelWidth, wheelHeight, 80), -rect.width / 2 + .5f, rect.height / 2 - 3f);
+        frontLeftJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(), tires[0].body, -rect.width / 2 + .5f, rect.height / 2 - 3f);
 
         // front right joint
-        frontRightJoint = (RevoluteJoint) createTireJoint(world, tires[1] = new Tire(world, body.getMass(), wheelWidth, wheelHeight, 80), rect.width / 2 - .5f, rect.height / 2 - 3f);
+        frontRightJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(), tires[1].body, rect.width / 2 - .5f, rect.height / 2 - 3f);
 
         float friction = 0.7f;
         float airDrag = 0.2f;
@@ -63,6 +65,9 @@ public class TrackCar extends Car {
         tires[1].setMaxDriveForce(2100);
         tires[1].setMaxForwardSpeed(35);
         tires[1].setMaxBackwardSpeed(-30);
+
+        Drill drill = new Drill(body, gameWorld.getController(), .5f, 0, 2.7f);
+
     }
 
     @Override

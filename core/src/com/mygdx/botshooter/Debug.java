@@ -121,8 +121,8 @@ public class Debug {
 
         stage.act(delta);
         stage.draw();
-        stage.getBatch().begin();
-        stage.getBatch().end();
+//        stage.getBatch().begin();
+//        stage.getBatch().end();
 
         if(gameCamera != null) {
             shapeRenderer.setProjectionMatrix(gameCamera.combined);

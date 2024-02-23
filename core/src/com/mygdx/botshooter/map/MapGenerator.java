@@ -1,6 +1,7 @@
 package com.mygdx.botshooter.map;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,7 +21,7 @@ public class MapGenerator {
     private final int TILE_SIZE = 32;
     public TiledMap map;
 
-    public OrthographicCamera camera;
+    public Camera camera;
     public Renderer renderer;
     public TiledMapTileLayer mountainLayer;
     public TiledMapTileLayer groundLayer;
@@ -31,7 +32,7 @@ public class MapGenerator {
 
         Texture mountainTiles = new Texture(Gdx.files.internal("mountain.png"));
         TextureRegion[][] splitTiles = TextureRegion.split(mountainTiles, TILE_SIZE, TILE_SIZE);
-        TextureRegion rockyMountain = splitTiles[0][0];
+        TextureRegion rockyMountain = splitTiles[0][1];
 
         Texture groundTiles = new Texture(Gdx.files.internal("gravel.png"));
         TextureRegion[][] gravelGround = TextureRegion.split(groundTiles, TILE_SIZE, TILE_SIZE);

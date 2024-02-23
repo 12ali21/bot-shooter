@@ -1,29 +1,27 @@
 package com.mygdx.botshooter.characters.car;
 
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.botshooter.Constants;
-import com.mygdx.botshooter.Debug;
+import com.mygdx.botshooter.GameWorld;
 import com.mygdx.botshooter.characters.DynamicObject;
 
 public abstract class Car extends DynamicObject {
     protected Tire[] tires;
     protected RevoluteJoint frontLeftJoint, frontRightJoint;
 
-    public Car(World world, Rectangle rect, float boundsSize) {
-        super(boundsSize);
+    public Car(GameWorld gameWorld, Rectangle rect, float boundsSize) {
+        super(gameWorld, boundsSize);
         BodyDef bodyDef = new BodyDef();
         bodyDef.position.set(rect.x, rect.y);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
-        body = world.createBody(bodyDef);
+        body = gameWorld.getWorld().createBody(bodyDef);
     }
 
-    protected Joint createTireJoint(World world, Tire tire, float x, float y) {
+    protected Joint createRevoluteJoint(World world, Body bodyB, float x, float y) {
         RevoluteJointDef jointDef = new RevoluteJointDef();
         jointDef.bodyA = body;
 
@@ -36,7 +34,7 @@ public abstract class Car extends DynamicObject {
         // joint anchor in tire is in center
         jointDef.localAnchorB.setZero();
 
-        jointDef.bodyB = tire.body;
+        jointDef.bodyB = bodyB;
         jointDef.localAnchorA.set(x, y);
 
         return world.createJoint(jointDef);

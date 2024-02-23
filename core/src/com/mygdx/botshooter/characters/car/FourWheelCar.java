@@ -5,20 +5,19 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
-import com.badlogic.gdx.physics.box2d.joints.RevoluteJointDef;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.Constants;
 import com.mygdx.botshooter.Debug;
+import com.mygdx.botshooter.GameWorld;
 
 public class FourWheelCar extends Car{
 
     protected float lockAngle = 12 * MathUtils.degreesToRadians;
     protected float turnSpeed = 120 * MathUtils.degreesToRadians;
 
-    public FourWheelCar(World world, Rectangle rect) {
-        super(world, rect, 10f);
+    public FourWheelCar(GameWorld gameWorld, Rectangle rect) {
+        super(gameWorld, rect, 10f);
         tires = new Tire[4];
 
         PolygonShape shape = new PolygonShape();
@@ -44,28 +43,32 @@ public class FourWheelCar extends Car{
         float wheelWidth = 0.2f;
         float wheelHeight = 0.5f;
 
+        tires[0] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight);
+        tires[1] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight);
+        tires[2] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight);
+        tires[3] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight);
 
         // front left joint
-        frontLeftJoint = (RevoluteJoint) createTireJoint(world,
-                tires[0] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
+        frontLeftJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(),
+                tires[0].body,
                 -rect.width / 2,
                 rect.height / 2 - 2.2f);
 
         // front right joint
-        frontRightJoint = (RevoluteJoint) createTireJoint(world,
-                tires[1] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
+        frontRightJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(),
+                tires[1].body,
                 rect.width / 2,
                 rect.height / 2 - 2.2f);
 
         // back left joint
-        createTireJoint(world,
-                tires[2] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
+        createRevoluteJoint(gameWorld.getWorld(),
+                tires[2].body,
                 -rect.width / 2,
                 -rect.height / 2 + .6f);
 
         // back right joint
-        createTireJoint(world,
-                tires[3] = new Tire(world, body.getMass(), wheelWidth, wheelHeight),
+        createRevoluteJoint(gameWorld.getWorld(),
+                tires[3].body,
                 rect.width / 2,
                 -rect.height / 2 + .6f);
     }

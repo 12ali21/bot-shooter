@@ -89,10 +89,10 @@ public class Projectile implements Drawable {
 
     public void render(Batch batch){
         if(!alive) return;
-        if(MapController.checkCollisionWithWalls(sprite.getBoundingRectangle())){
-            destroy();
-            return;
-        }
+//        if(MapController.checkCollisionWithWalls(sprite.getBoundingRectangle())){
+//            destroy();
+//            return;
+//        }
         sprite.draw(batch);
     }
 }

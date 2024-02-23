@@ -35,8 +35,6 @@ public class Player implements InputProcessor, Drawable {
 
     private boolean collision = true;
 
-    private MapController map;
-
     OrthographicCamera camera;
     TrackCar body;
 
@@ -45,8 +43,7 @@ public class Player implements InputProcessor, Drawable {
     private Vector3 tmpVector3 = new Vector3();
     private Vector2 tmpVector2 = new Vector2();
 
-    public Player(MapController map, OrthographicCamera camera) {
-        this.map = map;
+    public Player(GameWorld gameWorld, OrthographicCamera camera) {
         this.camera = camera;
 
         int posX = 100, posY = 10;
@@ -63,7 +60,7 @@ public class Player implements InputProcessor, Drawable {
         assignRightWeapon(new MiniGun(camera, new Vector2(0.9f, 1.2f)));
         assignLeftWeapon(new MiniGun(camera, new Vector2(-0.9f, 1.2f)));
 
-        body = new TrackCar(GameScreen.world, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
+        body = new TrackCar(gameWorld, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
         TextureRegion region = new TextureRegion();
     }
 
