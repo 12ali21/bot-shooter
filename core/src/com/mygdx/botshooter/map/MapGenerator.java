@@ -26,19 +26,26 @@ public class MapGenerator {
     public TiledMapTileLayer mountainLayer;
     public TiledMapTileLayer groundLayer;
 
+    Random random;
+
     Cell[] groundCells;
     Cell[] mountainCells;
+    Cell[] rockyGroundCells;
 
 
     public MapGenerator(int seed, int width, int height, OrthographicCamera camera) {
         this.camera = camera;
-        Random random = new Random(seed);
+        random = new Random(seed);
 
         Texture mountainTiles = new Texture(Gdx.files.internal("mountain.png"));
         TextureRegion[][] mountain = TextureRegion.split(mountainTiles, TILE_SIZE, TILE_SIZE);
 
-        Texture groundTiles = new Texture(Gdx.files.internal("gravel.png"));
-        TextureRegion[][] gravelGround = TextureRegion.split(groundTiles, TILE_SIZE, TILE_SIZE);
+        Texture groundTiles = new Texture(Gdx.files.internal("ground.png"));
+        TextureRegion[][] ground = TextureRegion.split(groundTiles, TILE_SIZE, TILE_SIZE);
+
+
+        Texture rockyGroundTiles = new Texture(Gdx.files.internal("rock_ground.png"));
+        TextureRegion[][] rockyGround = TextureRegion.split(rockyGroundTiles, TILE_SIZE, TILE_SIZE);
 
 
         map = new TiledMap();
@@ -50,31 +57,42 @@ public class MapGenerator {
         float noise;
 
 
-        mountainCells = new Cell[] {
+        mountainCells = new Cell[]{
                 new Cell().setTile(new StaticTiledMapTile(mountain[0][0])),
                 new Cell().setTile(new StaticTiledMapTile(mountain[0][1])),
                 new Cell().setTile(new StaticTiledMapTile(mountain[1][0])),
                 new Cell().setTile(new StaticTiledMapTile(mountain[1][1]))
         };
 
-        groundCells = new Cell[] {
-                new Cell().setTile(new StaticTiledMapTile(gravelGround[0][0])),
-                new Cell().setTile(new StaticTiledMapTile(gravelGround[0][1])),
-                new Cell().setTile(new StaticTiledMapTile(gravelGround[1][0])),
-                new Cell().setTile(new StaticTiledMapTile(gravelGround[1][1]))
+        groundCells = new Cell[]{
+                new Cell().setTile(new StaticTiledMapTile(ground[0][0])),
+                new Cell().setTile(new StaticTiledMapTile(ground[0][1])),
+                new Cell().setTile(new StaticTiledMapTile(ground[1][0])),
+                new Cell().setTile(new StaticTiledMapTile(ground[1][1]))
         };
 
+
+        rockyGroundCells = new Cell[]{
+                new Cell().setTile(new StaticTiledMapTile(rockyGround[0][0])),
+                new Cell().setTile(new StaticTiledMapTile(rockyGround[0][1])),
+                new Cell().setTile(new StaticTiledMapTile(rockyGround[1][0])),
+                new Cell().setTile(new StaticTiledMapTile(rockyGround[1][1]))
+        };
+
+        float normalNoise;
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
                 noise = OpenSimplex2S.noise2(seed, x * SCALE, y * SCALE);
+                normalNoise = (noise + 1) / 2f;
                 // fill with mountain wall
-                if ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ||
-                        (noise + 1) / 2f > 0.6) {
+                if (x == 0 || x == width - 1 || y == 0 || y == height - 1 || (normalNoise > 0.6)) {
                     mountainLayer.setCell(x, y, mountainCells[0]);
                 }
                 // fill the ground with gravel
-                else {
-                    groundLayer.setCell(x, y, getRandomCell(groundCells, random));
+                else if (normalNoise > 0.55f) {
+                    groundLayer.setCell(x, y, getRandomCell(rockyGroundCells));
+                } else {
+                    groundLayer.setCell(x, y, getRandomCell(groundCells));
                 }
             }
         }
@@ -85,7 +103,7 @@ public class MapGenerator {
     }
 
     // returns a random cell of a cell array
-    Cell getRandomCell(Cell[] cells, Random random) {
+    Cell getRandomCell(Cell[] cells) {
         int pos = random.nextInt(cells.length);
         return cells[pos];
     }

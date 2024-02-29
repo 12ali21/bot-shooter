@@ -1,0 +1,11 @@
+driller.png
+size:2048,256
+repeat:none
+body
+bounds:1544,2,128,128
+drill
+bounds:2,2,512,128
+left_track
+bounds:516,2,512,128
+right_track
+bounds:1030,2,512,128

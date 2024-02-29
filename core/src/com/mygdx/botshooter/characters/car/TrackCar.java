@@ -1,5 +1,6 @@
 package com.mygdx.botshooter.characters.car;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
@@ -32,7 +33,7 @@ public class TrackCar extends Car {
 
         shape.set(vertices);
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.friction = 0;
+        fixtureDef.friction = 1;
         fixtureDef.restitution = 0;
         fixtureDef.density = 5f;
         fixtureDef.shape = shape;
@@ -69,7 +70,10 @@ public class TrackCar extends Car {
         tires[1].setMaxForwardSpeed(35);
         tires[1].setMaxBackwardSpeed(-30);
 
-        drill = new Drill(body, gameWorld.getController(), 2f,3f, 0, 1.7f);
+        drill = new Drill(body, gameWorld.getController(), 4f,3f, 0, 1.7f);
+//
+//        body.setFixedRotation(true);
+//        body.setTransform(rect.x, rect.y, -30f * MathUtils.degreesToRadians);
 
     }
 

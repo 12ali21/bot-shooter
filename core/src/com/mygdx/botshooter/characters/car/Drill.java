@@ -1,11 +1,13 @@
 package com.mygdx.botshooter.characters.car;
 
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.GameContactListener;
 import com.mygdx.botshooter.MyContactListener;
+import com.mygdx.botshooter.SolidCell;
 import com.mygdx.botshooter.map.MapController;
 import com.mygdx.botshooter.util.Timer;
 import com.mygdx.botshooter.util.TimerAction;

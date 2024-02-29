@@ -65,8 +65,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        update(delta);
         mainBatch.setProjectionMatrix(camera.combined);
+        update(delta);
         mainBatch.begin();
         // Render ground layer
         gameWorld.renderGround(mainBatch);

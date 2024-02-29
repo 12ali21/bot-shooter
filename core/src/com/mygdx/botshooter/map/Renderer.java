@@ -33,11 +33,11 @@ class Renderer {
     private Vector2[] getCameraBounds() {
         return new Vector2[]{
                 new Vector2(
-                        (int) (camera.position.x - camera.viewportWidth / 2 - 1),
-                        (int) (camera.position.y - camera.viewportHeight / 2 - 1)),
+                        (int) (camera.position.x - camera.viewportWidth / 2 - 5),
+                        (int) (camera.position.y - camera.viewportHeight / 2 - 5)),
                 new Vector2(
-                        (int) (camera.position.x + camera.viewportWidth / 2 + 1),
-                        (int) (camera.position.y + camera.viewportHeight / 2 + 1))
+                        (int) (camera.position.x + camera.viewportWidth / 2 + 5),
+                        (int) (camera.position.y + camera.viewportHeight / 2 + 5))
         };
     }
 

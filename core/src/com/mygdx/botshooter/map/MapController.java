@@ -17,6 +17,7 @@ import com.mygdx.botshooter.Debug;
 import com.mygdx.botshooter.SolidCell;
 
 import java.util.HashSet;
+import java.util.Random;
 
 
 public class MapController implements Disposable {
@@ -119,6 +120,7 @@ public class MapController implements Disposable {
             map.mountainLayer.setCell(x, y, map.mountainCells[3]);
         } else if(cell == map.mountainCells[3]) {
             map.mountainLayer.setCell(x, y, null);
+            map.groundLayer.setCell(x, y, map.getRandomCell(map.rockyGroundCells));
             return true;
         }
         return false;

@@ -49,7 +49,7 @@ public class TrackCarAnimator {
     private Pixmap wholePixmap;
 
     public TrackCarAnimator(String assets) {
-        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(assets).child("out.atlas"));
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(assets).child("driller.atlas"));
 
         body = atlas.findRegion(bodyRegion);
         TextureRegion[][] rightTrackFrames = atlas.findRegion(rightTrackRegion).split(frameSize, frameSize);
