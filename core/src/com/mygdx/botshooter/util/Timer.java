@@ -8,7 +8,7 @@ public class Timer {
     private final TimerAction action;
     private boolean active;
     private float interval;
-    private float tContainer = 0;
+    public float tContainer = 0;
 
     private boolean firstAct;
     private boolean firstActDone = false;

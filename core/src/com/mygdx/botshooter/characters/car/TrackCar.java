@@ -13,6 +13,9 @@ import com.mygdx.botshooter.GameWorld;
 public class TrackCar extends Car {
     private float tmp;
 
+    Drill drill;
+
+
     public TrackCar(GameWorld gameWorld, Rectangle rect) {
         super(gameWorld, rect, 10);
         tires = new Tire[2];
@@ -38,7 +41,7 @@ public class TrackCar extends Car {
         shape.dispose();
 
         float wheelWidth = 0.1f;
-        float wheelHeight = 2f;
+        float wheelHeight = 1.8f;
 
         tires[0] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight, 80);
         tires[1] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight, 80);
@@ -66,13 +69,27 @@ public class TrackCar extends Car {
         tires[1].setMaxForwardSpeed(35);
         tires[1].setMaxBackwardSpeed(-30);
 
-        Drill drill = new Drill(body, gameWorld.getController(), .5f, 0, 2.7f);
+        drill = new Drill(body, gameWorld.getController(), 2f,3f, 0, 1.7f);
 
     }
 
+    private Vector2 getForwardVelocity() {
+        // get the vector from the center to the top of the tire in world
+        Vector2 upNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
+        upNormal.nor();
+        // projection of linear velocity on up facing vector
+        upNormal.scl(upNormal.dot(body.getLinearVelocity()));
+        return upNormal;
+    }
+
+    private void applyDrillForce() {
+        body.applyForceToCenter(getForwardVelocity().scl(-2000f), true);
+    }
+
     @Override
-    public void updateDrive(Array<ControlAction> actions) {
+    public void updateDrive(Array<ControlAction> actions, float delta) {
         int right = 0, left = 0;
+        boolean isDrilling = false;
 
         ControlAction rightAction = ControlAction.DO_NOTHING;
         ControlAction leftAction = ControlAction.DO_NOTHING;
@@ -94,6 +111,9 @@ public class TrackCar extends Car {
                     right--;
                     left++;
                     break;
+                case DRILL:
+                    isDrilling = true;
+                    break;
             }
         }
 
@@ -105,6 +125,14 @@ public class TrackCar extends Car {
 
         tires[1].update(rightAction);
         tires[0].update(leftAction);
+
+
+        if(isDrilling) {
+            applyDrillForce();
+            drill.setDrilling(true);
+        } else {
+            drill.setDrilling(false);
+        }
 
         updateFriction();
         update();

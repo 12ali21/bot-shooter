@@ -46,7 +46,7 @@ public abstract class Car extends DynamicObject {
         }
     }
 
-    public abstract void updateDrive(Array<ControlAction> actions);
+    public abstract void updateDrive(Array<ControlAction> actions, float delta);
     public Vector2 getPosition() {
         return body.getPosition();
     }

@@ -109,6 +109,7 @@ public class Player implements InputProcessor, Drawable {
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             animator.animateDrilling(1);
+            actions.add(ControlAction.DRILL);
         } else {
             animator.animateDrilling(0);
         }
@@ -120,7 +121,7 @@ public class Player implements InputProcessor, Drawable {
         sprite.setCenter(body.getPosition().x, body.getPosition().y);
         sprite.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
 
-        body.updateDrive(actions);
+        body.updateDrive(actions, delta);
 
         weaponL.update(delta,
                 sprite.getX() + sprite.getOriginX(),

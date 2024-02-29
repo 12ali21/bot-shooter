@@ -121,7 +121,7 @@ public class FourWheelCar extends Car{
     }
 
 
-    public void updateDrive(Array<ControlAction> actions) {
+    public void updateDrive(Array<ControlAction> actions, float delta) {
         int drive = 0;
         int turn = 0;
 

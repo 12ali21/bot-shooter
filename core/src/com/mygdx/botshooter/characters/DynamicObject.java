@@ -17,7 +17,6 @@ public class DynamicObject {
     private Array<Body> obstacles;
 
     protected Body body;
-    private static SolidCell wallUserData = new SolidCell();
     private final Rectangle bounds;
     private GameWorld gameWorld;
     private float boundsSize;

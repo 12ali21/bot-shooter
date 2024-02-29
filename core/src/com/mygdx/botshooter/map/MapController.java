@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -12,6 +14,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.botshooter.Debug;
+import com.mygdx.botshooter.SolidCell;
 
 import java.util.HashSet;
 
@@ -98,6 +101,27 @@ public class MapController implements Disposable {
         for(Rectangle bounds : registeredBounds) {
             recalculateObstacles(world, bounds);
         }
+    }
+
+    public void removeWall(int x, int y) {
+        System.out.println("removing wall: " + x + "," + y);
+
+        map.mountainLayer.setCell(x, y, null);
+    }
+
+    public boolean damageWall(int x, int y) {
+        Cell cell = map.mountainLayer.getCell(x, y);
+        if(cell == map.mountainCells[0]) {
+            map.mountainLayer.setCell(x, y, map.mountainCells[1]);
+        } else if(cell == map.mountainCells[1]) {
+            map.mountainLayer.setCell(x, y, map.mountainCells[2]);
+        } else if(cell == map.mountainCells[2]) {
+            map.mountainLayer.setCell(x, y, map.mountainCells[3]);
+        } else if(cell == map.mountainCells[3]) {
+            map.mountainLayer.setCell(x, y, null);
+            return true;
+        }
+        return false;
     }
 
 

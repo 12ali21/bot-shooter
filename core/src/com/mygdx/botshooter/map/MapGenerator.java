@@ -26,13 +26,16 @@ public class MapGenerator {
     public TiledMapTileLayer mountainLayer;
     public TiledMapTileLayer groundLayer;
 
+    Cell[] groundCells;
+    Cell[] mountainCells;
+
+
     public MapGenerator(int seed, int width, int height, OrthographicCamera camera) {
         this.camera = camera;
         Random random = new Random(seed);
 
         Texture mountainTiles = new Texture(Gdx.files.internal("mountain.png"));
-        TextureRegion[][] splitTiles = TextureRegion.split(mountainTiles, TILE_SIZE, TILE_SIZE);
-        TextureRegion rockyMountain = splitTiles[0][1];
+        TextureRegion[][] mountain = TextureRegion.split(mountainTiles, TILE_SIZE, TILE_SIZE);
 
         Texture groundTiles = new Texture(Gdx.files.internal("gravel.png"));
         TextureRegion[][] gravelGround = TextureRegion.split(groundTiles, TILE_SIZE, TILE_SIZE);
@@ -47,10 +50,14 @@ public class MapGenerator {
         float noise;
 
 
-        Cell mountainCell = new SolidCell();
-        mountainCell.setTile(new StaticTiledMapTile(rockyMountain));
+        mountainCells = new Cell[] {
+                new Cell().setTile(new StaticTiledMapTile(mountain[0][0])),
+                new Cell().setTile(new StaticTiledMapTile(mountain[0][1])),
+                new Cell().setTile(new StaticTiledMapTile(mountain[1][0])),
+                new Cell().setTile(new StaticTiledMapTile(mountain[1][1]))
+        };
 
-        Cell[] groundCells = new Cell[] {
+        groundCells = new Cell[] {
                 new Cell().setTile(new StaticTiledMapTile(gravelGround[0][0])),
                 new Cell().setTile(new StaticTiledMapTile(gravelGround[0][1])),
                 new Cell().setTile(new StaticTiledMapTile(gravelGround[1][0])),
@@ -63,7 +70,7 @@ public class MapGenerator {
                 // fill with mountain wall
                 if ((x == 0 || x == width - 1 || y == 0 || y == height - 1) ||
                         (noise + 1) / 2f > 0.6) {
-                    mountainLayer.setCell(x, y, mountainCell);
+                    mountainLayer.setCell(x, y, mountainCells[0]);
                 }
                 // fill the ground with gravel
                 else {
