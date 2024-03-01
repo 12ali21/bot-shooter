@@ -1,12 +1,10 @@
-package com.mygdx.botshooter;
+package com.mygdx.botshooter.screen;
 
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.botshooter.characters.animator.TrackCarAnimator;
 
 public class TestScreen implements Screen {
     TrackCarAnimator animator;
@@ -20,7 +18,7 @@ public class TestScreen implements Screen {
     public void show() {
         camera = new OrthographicCamera(100, 100 / ASPECT_RATIO);
         batch = new SpriteBatch();
-        animator = new TrackCarAnimator("player/driller_default");
+//        animator = new TrackCarAnimator("player/driller_default", 6);
 
     }
 
@@ -29,7 +27,7 @@ public class TestScreen implements Screen {
         camera.update();
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        batch.draw(animator.getFrame(delta), 0, 0);
+//        batch.draw(animator.getFrame(delta), 0, 0);
         batch.end();
 
     }

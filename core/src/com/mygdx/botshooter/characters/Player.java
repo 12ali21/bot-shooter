@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -12,22 +11,18 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.*;
-import com.mygdx.botshooter.characters.car.Car;
+import com.mygdx.botshooter.characters.animator.TrackCarAnimator;
 import com.mygdx.botshooter.characters.car.ControlAction;
-import com.mygdx.botshooter.characters.car.FourWheelCar;
 import com.mygdx.botshooter.characters.car.TrackCar;
 import com.mygdx.botshooter.characters.weapons.MiniGun;
 import com.mygdx.botshooter.characters.weapons.Weapon;
-import com.mygdx.botshooter.map.MapController;
 
 
 public class Player implements InputProcessor, Drawable {
     private final float SIZE = 6;
 
-    private Sprite sprite;
     private Weapon weaponR;
     private Weapon weaponL;
 
@@ -49,13 +44,8 @@ public class Player implements InputProcessor, Drawable {
         int posX = 100, posY = 10;
 
         animator = new TrackCarAnimator("player/driller_default");
-
-        sprite = new Sprite(animator.getIdle());
-        // position in world
-        sprite.setPosition(posX, posY);
-        // center position with respect to the player
-        sprite.setOrigin(SIZE / 2, SIZE / 2);
-        sprite.setSize(SIZE, SIZE);
+        animator.setSize(SIZE, SIZE);
+        animator.setOrigin(SIZE/2, SIZE/2);
 
         assignRightWeapon(new MiniGun(camera, new Vector2(0.9f, 1.2f)));
         assignLeftWeapon(new MiniGun(camera, new Vector2(-0.9f, 1.2f)));
@@ -81,14 +71,16 @@ public class Player implements InputProcessor, Drawable {
     public void render(Batch batch) {
 //        weaponL.render(batch);
 //        weaponR.render(batch);
-        sprite.draw(batch);
+//        sprite.draw(batch);
+        animator.render(batch, getWorldCenter());
     }
+
 
 
     @Override
     public void update(float delta) {
-        Debug.log("Player X", "" + sprite.getX());
-        Debug.log("Player Y", "" + sprite.getY());
+//        Debug.log("Player X", "" + sprite.getX());
+//        Debug.log("Player Y", "" + sprite.getY());
 
         // clear actions
         actions.clear();
@@ -116,22 +108,21 @@ public class Player implements InputProcessor, Drawable {
 
         animator.animateLeftTrack(body.getLeftTrackSpeed());
         animator.animateRightTrack(body.getRightTrackSpeed());
+        animator.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
 
-        sprite.setTexture(animator.getFrame(delta));
-        sprite.setCenter(body.getPosition().x, body.getPosition().y);
-        sprite.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
+        animator.update(delta);
 
         body.updateDrive(actions, delta);
 
-        weaponL.update(delta,
-                sprite.getX() + sprite.getOriginX(),
-                sprite.getY() + sprite.getOriginY(),
-                sprite.getRotation());
-
-        weaponR.update(delta,
-                sprite.getX() + sprite.getOriginX(),
-                sprite.getY() + sprite.getOriginY(),
-                sprite.getRotation());
+//        weaponL.update(delta,
+//                sprite.getX() + sprite.getOriginX(),
+//                sprite.getY() + sprite.getOriginY(),
+//                sprite.getRotation());
+//
+//        weaponR.update(delta,
+//                sprite.getX() + sprite.getOriginX(),
+//                sprite.getY() + sprite.getOriginY(),
+//                sprite.getRotation());
 
     }
 

@@ -1,4 +1,4 @@
-package com.mygdx.botshooter;
+package com.mygdx.botshooter.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -6,6 +6,9 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.botshooter.Debug;
+import com.mygdx.botshooter.GameWorld;
+import com.mygdx.botshooter.ScreenInputAdapter;
 import com.mygdx.botshooter.characters.Biter;
 import com.mygdx.botshooter.characters.Player;
 import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
@@ -65,8 +68,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        mainBatch.setProjectionMatrix(camera.combined);
         update(delta);
+        mainBatch.setProjectionMatrix(camera.combined);
         mainBatch.begin();
         // Render ground layer
         gameWorld.renderGround(mainBatch);

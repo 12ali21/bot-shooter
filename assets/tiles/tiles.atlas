@@ -1,0 +1,9 @@
+tiles.png
+size:256,128
+repeat:none
+ground
+bounds:134,2,64,64
+mountain
+bounds:68,2,64,64
+rock_ground
+bounds:2,2,64,64

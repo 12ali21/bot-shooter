@@ -31,7 +31,7 @@ public class GameWorld {
     }
 
     public void debug(Camera camera, float delta) {
-//        box2DDebugRenderer.render(world, camera.combined);
+        box2DDebugRenderer.render(world, camera.combined);
 
         if (doDebugging) {
             Debug.render(delta);

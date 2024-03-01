@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayers;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -37,15 +38,13 @@ public class MapGenerator {
         this.camera = camera;
         random = new Random(seed);
 
-        Texture mountainTiles = new Texture(Gdx.files.internal("mountain.png"));
-        TextureRegion[][] mountain = TextureRegion.split(mountainTiles, TILE_SIZE, TILE_SIZE);
+        TextureAtlas atlas = new TextureAtlas(Gdx.files.internal("tiles/tiles.atlas"));
 
-        Texture groundTiles = new Texture(Gdx.files.internal("ground.png"));
-        TextureRegion[][] ground = TextureRegion.split(groundTiles, TILE_SIZE, TILE_SIZE);
+        TextureRegion[][] mountain = atlas.findRegion("mountain").split(TILE_SIZE, TILE_SIZE);
 
+        TextureRegion[][] ground = atlas.findRegion("ground").split(TILE_SIZE, TILE_SIZE);
 
-        Texture rockyGroundTiles = new Texture(Gdx.files.internal("rock_ground.png"));
-        TextureRegion[][] rockyGround = TextureRegion.split(rockyGroundTiles, TILE_SIZE, TILE_SIZE);
+        TextureRegion[][] rockyGround = atlas.findRegion("rock_ground").split(TILE_SIZE, TILE_SIZE);
 
 
         map = new TiledMap();
