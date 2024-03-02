@@ -1,9 +1,9 @@
 tiles.png
-size:256,128
+size:256,256
 repeat:none
 ground
-bounds:134,2,64,64
+bounds:2,68,128,128
 mountain
-bounds:68,2,64,64
-rock_ground
+bounds:132,132,64,64
+rocky_ground
 bounds:2,2,64,64

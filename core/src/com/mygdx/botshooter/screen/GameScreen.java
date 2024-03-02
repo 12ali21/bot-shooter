@@ -6,12 +6,11 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.botshooter.Debug;
-import com.mygdx.botshooter.GameWorld;
-import com.mygdx.botshooter.ScreenInputAdapter;
-import com.mygdx.botshooter.characters.Biter;
-import com.mygdx.botshooter.characters.Player;
-import com.mygdx.botshooter.characters.weapons.ProjectilesUtil;
+import com.mygdx.botshooter.util.Debug;
+import com.mygdx.botshooter.world.GameWorld;
+import com.mygdx.botshooter.world.characters.Biter;
+import com.mygdx.botshooter.world.characters.Player;
+import com.mygdx.botshooter.world.characters.weapons.ProjectilesUtil;
 
 public class GameScreen implements Screen {
 

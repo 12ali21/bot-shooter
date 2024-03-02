@@ -4,7 +4,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.botshooter.characters.animator.TrackCarAnimator;
+import com.mygdx.botshooter.world.characters.animator.TrackCarAnimator;
 
 public class TestScreen implements Screen {
     TrackCarAnimator animator;
