@@ -74,18 +74,8 @@ public class TrackCar extends Car {
 
     }
 
-    private Vector2 getForwardVelocity() {
-        // get the vector from the center to the top of the tire in world
-        Vector2 upNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
-        upNormal.nor();
-        // projection of linear velocity on up facing vector
-        upNormal.scl(upNormal.dot(body.getLinearVelocity()));
-        return upNormal;
-    }
 
-    private void applyDrillForce() {
-        body.applyForceToCenter(getForwardVelocity().scl(-2000f), true);
-    }
+
 
     @Override
     public void updateDrive(Array<ControlAction> actions, float delta) {
@@ -129,12 +119,11 @@ public class TrackCar extends Car {
 
 
         if(isDrilling) {
-            applyDrillForce();
             drill.setDrilling(true);
         } else {
             drill.setDrilling(false);
         }
-
+        drill.update();
         updateFriction();
         update();
     }

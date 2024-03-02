@@ -29,7 +29,6 @@ public class TrackCarAnimator extends Animator{
     private Pixmap wholePixmap;
 
     public TrackCarAnimator(String assets) {
-        this.size = size;
         TextureAtlas atlas = new TextureAtlas(Gdx.files.internal(assets).child("driller.atlas"));
 
         body = atlas.findRegion(bodyRegion);
@@ -39,7 +38,7 @@ public class TrackCarAnimator extends Animator{
 
         rightTrack = new AnimatedPart(new Animation<>(.03f, rightTrackFrames[0]));
         leftTrack = new AnimatedPart(new Animation<>(.03f, leftTrackFrames[0]));
-        drill = new AnimatedPart(new Animation<>(.03f, drillFrames[0]));
+        drill = new AnimatedPart(new Animation<>(.05f, drillFrames[0]));
 
         wholePixmap = new Pixmap(frameSize, frameSize, Pixmap.Format.RGBA8888);
 
