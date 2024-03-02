@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.MathUtils;
 public class ScreenInputAdapter extends InputAdapter {
 
     public static final float FOVLimitLow = 50;
-    public static final float FOVLimitHigh = 128;
+    public static final float FOVLimitHigh = 1280;
     public static final float FOVChangeSpeed = 5f;
 
     private float FOV = FOVLimitLow;

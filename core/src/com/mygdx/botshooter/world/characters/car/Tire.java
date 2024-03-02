@@ -1,5 +1,6 @@
 package com.mygdx.botshooter.world.characters.car;
 
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -28,13 +29,13 @@ public class Tire {
      * @param world physics world
      * @param mass  mass of the object on top of this tire
      */
-    public Tire(World world, float mass, float width, float height, float density) {
+    public Tire(World world, float mass, Rectangle rect, float density) {
         this.mass = mass;
-        this.width = width;
-        this.height = height;
+        this.width = rect.width;
+        this.height = rect.height;
 
         BodyDef bodyDef = new BodyDef();
-        bodyDef.position.set(100, 2);
+        bodyDef.position.set(rect.x, rect.y);
         bodyDef.type = BodyDef.BodyType.DynamicBody;
 
         body = world.createBody(bodyDef);
@@ -50,7 +51,7 @@ public class Tire {
     }
 
     public Tire(World world, float mass, float width, float height) {
-        this(world, mass, width, height, 30);
+        this(world, mass, new Rectangle(0, 0, width, height), 30);
     }
 
     private Vector2 getLateralVelocity() {

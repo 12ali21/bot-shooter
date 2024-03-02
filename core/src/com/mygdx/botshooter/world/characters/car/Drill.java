@@ -7,7 +7,6 @@ import com.mygdx.botshooter.world.GameContactListener;
 import com.mygdx.botshooter.world.MyContactListener;
 import com.mygdx.botshooter.world.map.MapController;
 import com.mygdx.botshooter.util.Timer;
-import com.mygdx.botshooter.util.TimerAction;
 
 import java.util.HashMap;
 import java.util.Objects;
@@ -41,7 +40,7 @@ public class Drill implements MyContactListener {
     private float drillSpeed;
 
     private boolean isDrilling = false;
-    private boolean forceApplied = false;
+    private float sinceForceApplied = 1f;
 
     private HashMap<WallItem, Timer> blocksInContact;
 
@@ -94,11 +93,8 @@ public class Drill implements MyContactListener {
                 timer.tick(drillSpeed);
                 System.out.println(blocksInContact.size());
             }
+            sinceForceApplied = 0;
 
-            if (!forceApplied) {
-                applyDrillingForce();
-                forceApplied = true;
-            }
             return true;
         }
         return false;
@@ -117,8 +113,13 @@ public class Drill implements MyContactListener {
         return upNormal;
     }
 
-    public void update() {
-        forceApplied = false;
+    public void update(float delta) {
+        if (sinceForceApplied < 0.5f) {
+            applyDrillingForce();
+        }
+        sinceForceApplied += delta;
+        if(sinceForceApplied > 1) sinceForceApplied = 1;
+
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.joints.RevoluteJoint;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.botshooter.util.Debug;
 import com.mygdx.botshooter.world.GameWorld;
 
 public class TrackCar extends Car {
@@ -21,8 +22,8 @@ public class TrackCar extends Car {
         PolygonShape shape = new PolygonShape();
         Vector2[] vertices = new Vector2[]{
                 new Vector2(-rect.width / 2 + 0.2f,
-                -rect.height / 2 - 0.2f),
-                new Vector2(-rect.width / 2 + 0.2f,rect.height / 2 - 1.4f),
+                        -rect.height / 2 - 0.2f),
+                new Vector2(-rect.width / 2 + 0.2f, rect.height / 2 - 1.4f),
                 new Vector2(-0.2f, rect.height / 2),
                 new Vector2(0.2f, rect.height / 2),
                 new Vector2(rect.width / 2 - 0.2f, rect.height / 2 - 1.4f),
@@ -38,43 +39,51 @@ public class TrackCar extends Car {
         body.createFixture(fixtureDef);
         shape.dispose();
 
-        float wheelWidth = 0.1f;
-        float wheelHeight = 1.8f;
+        float tireX = rect.width / 2 - .5f;
+        float tireY = rect.height / 2 - 3f;
+        float tireWidth = 0.1f;
+        float tireHeight = 1.8f;
 
-        tires[0] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight, 80);
-        tires[1] = new Tire(gameWorld.getWorld(), body.getMass(), wheelWidth, wheelHeight, 80);
+
+        Rectangle leftTireRect = new Rectangle(body.getPosition().x - tireX, body.getPosition().y + tireY, tireWidth, tireHeight);
+        Rectangle rightTireRect = new Rectangle(body.getPosition().x + tireX, body.getPosition().y + tireY, tireWidth, tireHeight);
+
+        tires[0] = new Tire(gameWorld.getWorld(), body.getMass(), leftTireRect, 80);
+        tires[1] = new Tire(gameWorld.getWorld(), body.getMass(), rightTireRect, 80);
+
         // front left joint
-        frontLeftJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(), tires[0].body, -rect.width / 2 + .5f, rect.height / 2 - 3f);
+        frontLeftJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(), tires[0].body, -tireX, tireY);
 
         // front right joint
-        frontRightJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(), tires[1].body, rect.width / 2 - .5f, rect.height / 2 - 3f);
+        frontRightJoint = (RevoluteJoint) createRevoluteJoint(gameWorld.getWorld(), tires[1].body, tireX, tireY);
 
-        float friction = 0.7f;
+        float friction = 0.5f;
         float airDrag = 0.2f;
         float angularFriction = 0.25f;
+        float driveForce = 1200;
+        float maxForwardSpeed = 20;
+        float maxBackwardSpeed = -15;
 
         tires[0].setAirDrag(airDrag);
         tires[0].setFriction(friction);
         tires[0].setAngularFriction(angularFriction);
-        tires[0].setMaxDriveForce(2100);
-        tires[0].setMaxForwardSpeed(35);
-        tires[0].setMaxBackwardSpeed(-30);
+        tires[0].setMaxDriveForce(driveForce);
+        tires[0].setMaxForwardSpeed(maxForwardSpeed);
+        tires[0].setMaxBackwardSpeed(maxBackwardSpeed);
 
         tires[1].setAirDrag(airDrag);
         tires[1].setFriction(friction);
         tires[1].setAngularFriction(angularFriction);
-        tires[1].setMaxDriveForce(2100);
-        tires[1].setMaxForwardSpeed(35);
-        tires[1].setMaxBackwardSpeed(-30);
+        tires[1].setMaxDriveForce(driveForce);
+        tires[1].setMaxForwardSpeed(maxForwardSpeed);
+        tires[1].setMaxBackwardSpeed(maxBackwardSpeed);
 
-        drill = new Drill(body, gameWorld.getController(), 4f,3f, 0, 1.7f);
+        drill = new Drill(body, gameWorld.getController(), 4f, 3f, 0, 1.7f);
 //
 //        body.setFixedRotation(true);
 //        body.setTransform(rect.x, rect.y, -30f * MathUtils.degreesToRadians);
 
     }
-
-
 
 
     @Override
@@ -118,14 +127,16 @@ public class TrackCar extends Car {
         tires[0].update(leftAction);
 
 
-        if(isDrilling) {
+        if (isDrilling) {
             drill.setDrilling(true);
         } else {
             drill.setDrilling(false);
         }
-        drill.update();
+        drill.update(delta);
         updateFriction();
         update();
+        Debug.log("Player Position: (", body.getPosition().x + " , " + body.getPosition().y + ")");
+        Debug.log("Player Velocity: ", body.getLinearVelocity().len());
     }
 
     public float getRightTrackSpeed() {
