@@ -1,10 +1,16 @@
 package com.mygdx.botshooter.world.map;
 
-import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.Files;
+import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.math.Vector2;
+
+import java.util.logging.FileHandler;
 
 class Renderer {
     public static final String MOUNTAIN_LAYER = "mountain.layer";
@@ -30,7 +36,7 @@ class Renderer {
         this.camera = camera;
     }
 
-    private Vector2[] getCameraBounds() {
+    private Vector2[] getCameraBounds(Camera camera) {
         return new Vector2[]{
                 new Vector2(
                         (int) (camera.position.x - camera.viewportWidth / 2 - 5),
@@ -41,10 +47,9 @@ class Renderer {
         };
     }
 
-    private void renderLayer(TiledMapTileLayer layer, Batch batch) {
+    private void renderLayer(TiledMapTileLayer layer, Batch batch, Vector2[] bounds) {
         TiledMapTileLayer.Cell cell;
 
-        Vector2[] bounds = getCameraBounds();
 
         for (int y = (int) bounds[0].y; y < bounds[1].y; y++) {
             for (int x = (int) bounds[0].x; x < bounds[1].x; x++) {
@@ -58,11 +63,25 @@ class Renderer {
 
     public void renderGround(Batch batch) {
         TiledMapTileLayer ground = (TiledMapTileLayer) map.getLayers().get(GROUND_LAYER);
-        renderLayer(ground, batch);
+        renderLayer(ground, batch, getCameraBounds(camera));
     }
 
     public void renderMountain(Batch batch) {
         TiledMapTileLayer mountain = (TiledMapTileLayer) map.getLayers().get(MOUNTAIN_LAYER);
-        renderLayer(mountain, batch);
+        renderLayer(mountain, batch, getCameraBounds(camera));
+    }
+    public TextureRegion renderMapTexture(Batch batch, Camera mapCamera) {
+        FrameBuffer buffer = new FrameBuffer(Pixmap.Format.RGBA8888, 2048, 2048, false);
+        Vector2[] bounds = getCameraBounds(mapCamera);
+        buffer.begin();
+        renderLayer((TiledMapTileLayer) map.getLayers().get(GROUND_LAYER), batch, bounds);
+        renderLayer((TiledMapTileLayer) map.getLayers().get(MOUNTAIN_LAYER), batch, bounds);
+        buffer.end();
+
+        Texture texture = buffer.getColorBufferTexture();
+        TextureRegion region = new TextureRegion(texture);
+        region.flip(false, true);
+
+        return region;
     }
 }

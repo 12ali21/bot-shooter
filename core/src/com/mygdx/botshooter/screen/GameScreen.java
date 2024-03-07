@@ -8,19 +8,19 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.botshooter.util.Debug;
 import com.mygdx.botshooter.world.GameWorld;
-import com.mygdx.botshooter.world.characters.Biter;
 import com.mygdx.botshooter.world.characters.Player;
 import com.mygdx.botshooter.world.characters.weapons.ProjectilesUtil;
 
 public class GameScreen implements Screen {
 
     OrthographicCamera camera;
+    OrthographicCamera mapCamera;
+
     SpriteBatch mainBatch;
-    private Player player;
     GameWorld gameWorld;
 
-    private static Vector2 v;
-    private Biter biter;
+    private Player player;
+
     public final float ASPECT_RATIO = 1920f / 1080f;
 
 
@@ -30,19 +30,20 @@ public class GameScreen implements Screen {
     public void show() {
         mainBatch = new SpriteBatch();
 
-        float w = Gdx.graphics.getWidth();
-        float h = Gdx.graphics.getHeight();
-        camera = new OrthographicCamera(10, 10 * h / w);
+        mapCamera = new OrthographicCamera(2048, 2048);
+        // create the main camera
+        camera = new OrthographicCamera(10, 10 / ASPECT_RATIO);
         Debug.setCamera(camera);
 
+        // create the physics world and the map
         gameWorld = new GameWorld(camera);
+        gameWorld.doDebugging(true);
 
-
+        // create the player
         player = new Player(gameWorld, camera);
-        biter = new Biter(40, 40);
 
+        // set an input adapter to the player
         inputAdapter = new ScreenInputAdapter();
-
         InputMultiplexer inputMultiplexer = new InputMultiplexer(inputAdapter, player);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
@@ -51,7 +52,6 @@ public class GameScreen implements Screen {
     private void update(float delta) {
         // update entities
         ProjectilesUtil.updateProjectiles(delta);
-        biter.update(delta);
         player.update(delta);
 
         // update world physics
@@ -76,7 +76,6 @@ public class GameScreen implements Screen {
         // Render game objects
         ProjectilesUtil.drawProjectiles(mainBatch);
         player.render(mainBatch);
-        biter.render(mainBatch);
 
         // Render mountain layer
         gameWorld.renderMountain(mainBatch);
@@ -97,10 +96,6 @@ public class GameScreen implements Screen {
         camera.viewportHeight = inputAdapter.getFOV() / ASPECT_RATIO;
     }
 
-    public static void test(Vector2 v) {
-        GameScreen.v = v;
-    }
-
 
     @Override
     public void pause() {
@@ -119,6 +114,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void dispose() {
-
+        mainBatch.dispose();
+        gameWorld.dispose();
     }
 }

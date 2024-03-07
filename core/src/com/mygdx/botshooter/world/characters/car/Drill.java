@@ -91,7 +91,6 @@ public class Drill implements MyContactListener {
                 blocksInContact.put(wallItem, timer);
             } else {
                 timer.tick(drillSpeed);
-                System.out.println(blocksInContact.size());
             }
             sinceForceApplied = 0;
 

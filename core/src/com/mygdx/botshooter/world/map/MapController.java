@@ -1,14 +1,16 @@
 package com.mygdx.botshooter.world.map;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.botshooter.util.Debug;
 
@@ -17,12 +19,17 @@ import java.util.HashSet;
 
 public class MapController implements Disposable {
     private final MapGenerator map;
+    private final Renderer renderer;
+
+
+    private TextureRegion mapTexture;
     private final HashSet<Body> obstacles;
     private final Array<Rectangle> registeredBounds;
     private final PolygonShape wallBox;
 
     public MapController(OrthographicCamera camera) {
         map = new MapGenerator(123, 2000, 2000, camera);
+        renderer = new Renderer(map.map, 1, camera);
 
         obstacles = new HashSet<>();
         registeredBounds = new Array<>(false, 16);
@@ -32,13 +39,29 @@ public class MapController implements Disposable {
     }
 
     public void renderGround(Batch batch) {
-        map.renderer.renderGround(batch);
+        renderer.renderGround(batch);
     }
 
     public void renderMountain(Batch batch) {
-        map.renderer.renderMountain(batch);
+        renderer.renderMountain(batch);
     }
 
+    public void renderMapTexture(Batch batch, Camera camera) {
+        if(mapTexture == null) {
+            mapTexture = renderer.renderMapTexture(batch, camera);
+        }
+        System.out.println(mapTexture.getRegionHeight());
+//        batch.draw(mapTexture.getTexture(),-1000, -1000, 2000, 2000);
+    }
+
+    /**
+     * Get all walls in the given bounds
+     * @param startX start X coordinate
+     * @param endX end X coordinate
+     * @param startY start Y coordinate
+     * @param endY end Y coordinate
+     * @return an array of rectangles representing the walls in the given bounds
+     */
     public Array<Rectangle> getWalls(int startX, int endX, int startY, int endY) {
         Array<Rectangle> cells = new Array<>();
         Cell cell;
@@ -53,16 +76,30 @@ public class MapController implements Disposable {
         return cells;
     }
 
+    /**
+     * Register bounds to be used for recalculating obstacles
+     * @param bounds the bounds to register
+     */
     public void registerBounds(Rectangle bounds) {
         registeredBounds.add(bounds);
     }
 
+    /**
+     * Destroy all obstacles
+     * @param world the world to destroy the obstacles in
+     */
     private void destroyObstacles(World world) {
         for (Body obstacle : obstacles) {
             world.destroyBody(obstacle);
         }
         obstacles.clear();
     }
+
+    /**
+     * Get all walls in the given bounds
+     * @param bounds the bounds to get the walls in
+     * @return an array of rectangles representing the walls in the given bounds
+     */
 
     private Array<Rectangle> getWallsInBounds(Rectangle bounds) {
         int sX = (int) bounds.x;
@@ -77,9 +114,8 @@ public class MapController implements Disposable {
         obstacles.add(body);
     }
 
-    private Array<Rectangle> wallsRect;
     private void recalculateObstacles(World world, Rectangle bounds) {
-        wallsRect = getWallsInBounds(bounds);
+        Array<Rectangle> wallsRect = getWallsInBounds(bounds);
         Body t;
         for (Rectangle wallRect : wallsRect) {
             BodyDef wallDef = new BodyDef();
@@ -99,12 +135,12 @@ public class MapController implements Disposable {
         }
     }
 
-    public void removeWall(int x, int y) {
-        System.out.println("removing wall: " + x + "," + y);
-
-        map.mountainLayer.setCell(x, y, null);
-    }
-
+    /**
+     * Damage a wall at the given coordinates
+     * @param x the X coordinate of the wall
+     * @param y the Y coordinate of the wall
+     * @return true if the wall was destroyed, false otherwise
+     */
     public boolean damageWall(int x, int y) {
         Cell cell = map.mountainLayer.getCell(x, y);
         if(cell == map.mountainCells[0]) {

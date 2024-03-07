@@ -21,7 +21,6 @@ public class MapGenerator {
     public TiledMap map;
 
     public Camera camera;
-    public Renderer renderer;
     public TiledMapTileLayer mountainLayer;
     public TiledMapTileLayer groundLayer;
 
@@ -107,7 +106,7 @@ public class MapGenerator {
                 else if (normalNoise > 0.55f) {
                     groundLayer.setCell(x, y, getRandomCell(rockyGroundCells));
                 } else {
-                    if(0.545f < normalNoise)
+                    if (0.545f < normalNoise)
                         groundLayer.setCell(x, y, getRandomCell(groundCells, 0, 4));
                     else
                         groundLayer.setCell(x, y, getRandomCell(groundCells, 4, groundCells.length));
@@ -116,8 +115,6 @@ public class MapGenerator {
         }
         layers.add(groundLayer);
         layers.add(mountainLayer);
-
-        renderer = new Renderer(map, 1, camera);
     }
 
     // returns a random cell of a cell array

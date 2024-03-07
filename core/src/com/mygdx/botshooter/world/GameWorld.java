@@ -6,16 +6,17 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Disposable;
 import com.mygdx.botshooter.util.Constants;
 import com.mygdx.botshooter.util.Debug;
 import com.mygdx.botshooter.world.map.MapController;
 
-public class GameWorld {
-    private boolean doDebugging = true;
+public class GameWorld implements Disposable {
+    private boolean doDebugging = false;
 
 
-    private World world;
-    private MapController mapController;
+    private final World world;
+    private final MapController mapController;
     Box2DDebugRenderer box2DDebugRenderer;
 
 
@@ -54,5 +55,15 @@ public class GameWorld {
 
     public void renderMountain(Batch mainBatch) {
         mapController.renderMountain(mainBatch);
+    }
+
+    public void doDebugging(boolean doDebugging) {
+        this.doDebugging = doDebugging;
+    }
+
+    @Override
+    public void dispose() {
+        world.dispose();
+        mapController.dispose();
     }
 }

@@ -63,14 +63,12 @@ lowMax: 20.0
 highMin: 60.0
 highMax: 60.0
 relative: true
-scalingCount: 3
+scalingCount: 2
 scaling0: 0.0
-scaling1: 0.2372871
-scaling2: 1.0
-timelineCount: 3
+scaling1: 1.0
+timelineCount: 2
 timeline0: 0.0
-timeline1: 0.4513893
-timeline2: 1.0
+timeline1: 1.0
 - Y Scale - 
 active: false
 - Velocity - 
@@ -127,16 +125,12 @@ lowMax: 0.0
 highMin: 1.0
 highMax: 1.0
 relative: false
-scalingCount: 4
-scaling0: 0.0
-scaling1: 0.22033846
-scaling2: 0.22033846
-scaling3: 0.0
-timelineCount: 4
+scalingCount: 2
+scaling0: 0.16949126
+scaling1: 0.033897787
+timelineCount: 2
 timeline0: 0.0
-timeline1: 0.2013889
-timeline2: 0.7916667
-timeline3: 1.0
+timeline1: 1.0
 - Options - 
 attached: false
 continuous: true
