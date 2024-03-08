@@ -1,4 +1,4 @@
-package com.mygdx.botshooter.world.characters.car;
+package com.mygdx.botshooter.world.characters.player.car;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -75,13 +75,13 @@ public class FourWheelCar extends Car{
 
     private void driveForward() {
         for (int i = 0; i < 4; i++) {
-            tires[i].update(ControlAction.DRIVE_FORWARD);
+            tires[i].update(ControlAction.UP);
         }
     }
 
     private void driveBackward() {
         for (int i = 0; i < 4; i++) {
-            tires[i].update(ControlAction.DRIVE_BACKWARD);
+            tires[i].update(ControlAction.DOWN);
         }
     }
 
@@ -127,16 +127,16 @@ public class FourWheelCar extends Car{
 
         for (ControlAction action : actions) {
             switch (action) {
-                case DRIVE_FORWARD:
+                case UP:
                     drive++;
                     break;
-                case DRIVE_BACKWARD:
+                case DOWN:
                     drive--;
                     break;
-                case TURN_LEFT:
+                case LEFT:
                     turn++;
                     break;
-                case TURN_RIGHT:
+                case RIGHT:
                     turn--;
                     break;
                 default:

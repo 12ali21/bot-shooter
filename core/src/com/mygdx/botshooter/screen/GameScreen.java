@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.botshooter.util.Debug;
 import com.mygdx.botshooter.world.GameWorld;
-import com.mygdx.botshooter.world.characters.Player;
+import com.mygdx.botshooter.world.characters.player.Player;
 import com.mygdx.botshooter.world.characters.weapons.ProjectilesUtil;
 
 public class GameScreen implements Screen {

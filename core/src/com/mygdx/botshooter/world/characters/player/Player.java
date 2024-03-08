@@ -1,4 +1,4 @@
-package com.mygdx.botshooter.world.characters;
+package com.mygdx.botshooter.world.characters.player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,9 +10,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.botshooter.world.GameWorld;
+import com.mygdx.botshooter.world.characters.Drawable;
 import com.mygdx.botshooter.world.characters.animator.TrackCarAnimator;
-import com.mygdx.botshooter.world.characters.car.ControlAction;
-import com.mygdx.botshooter.world.characters.car.TrackCar;
+import com.mygdx.botshooter.world.characters.player.car.ControlAction;
+import com.mygdx.botshooter.world.characters.player.car.TrackCar;
 
 
 public class Player implements InputProcessor, Drawable {
@@ -23,7 +24,8 @@ public class Player implements InputProcessor, Drawable {
     private final TrackCarAnimator animator;
 
     OrthographicCamera camera;
-    TrackCar body;
+    TrackCar drillerBody;
+    PlayerBot bot;
 
     Array<ControlAction> actions = new Array<>(false, 4);
 
@@ -34,6 +36,8 @@ public class Player implements InputProcessor, Drawable {
 
         int posX = 100, posY = 10;
 
+        bot = new PlayerBot(gameWorld, posX+10, posY);
+
         animator = new TrackCarAnimator("player/driller_default");
         animator.setSize(SIZE, SIZE);
         animator.setOrigin(SIZE /2, SIZE /2);
@@ -41,18 +45,19 @@ public class Player implements InputProcessor, Drawable {
 //        weaponL = new MiniGun(camera, new Vector2(0.9f, 1.2f));
 //        weaponL = new MiniGun(camera, new Vector2(-0.9f, 1.2f));
 
-        body = new TrackCar(gameWorld, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
+        drillerBody = new TrackCar(gameWorld, new Rectangle(posX, posY, SIZE - 3.4f, SIZE - 1.1f));
     }
 
 
 
     public Vector2 getWorldCenter() {
-        return body.getPosition();
+        return bot.getPosition();
     }
 
     @Override
     public void render(Batch batch) {
-        animator.render(batch, getWorldCenter());
+        animator.render(batch, drillerBody.getPosition());
+        bot.render(batch);
     }
 
 
@@ -63,34 +68,37 @@ public class Player implements InputProcessor, Drawable {
         actions.clear();
 
         if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-            actions.add(ControlAction.DRIVE_FORWARD);
+            actions.add(ControlAction.UP);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-            actions.add(ControlAction.DRIVE_BACKWARD);
+            actions.add(ControlAction.DOWN);
         }
 
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            actions.add(ControlAction.TURN_LEFT);
+            actions.add(ControlAction.LEFT);
         }
         if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            actions.add(ControlAction.TURN_RIGHT);
+            actions.add(ControlAction.RIGHT);
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
             animator.animateDrilling(1);
-            actions.add(ControlAction.DRILL);
+            actions.add(ControlAction.SPACE);
         } else {
             animator.animateDrilling(0);
         }
 
-        animator.animateLeftTrack(body.getLeftTrackSpeed());
-        animator.animateRightTrack(body.getRightTrackSpeed());
-        animator.setRotation(body.getRotation() * MathUtils.radiansToDegrees);
+        animator.animateLeftTrack(drillerBody.getLeftTrackSpeed());
+        animator.animateRightTrack(drillerBody.getRightTrackSpeed());
+        animator.setRotation(drillerBody.getRotation() * MathUtils.radiansToDegrees);
 
         animator.update(delta);
 
-        body.updateDrive(actions, delta);
+        bot.updateMovement(actions);
+        bot.update();
+//        drillerBody.updateDrive(actions, delta);
 
+        drillerBody.update();
 //        weaponL.update(delta,
 //                sprite.getX() + sprite.getOriginX(),
 //                sprite.getY() + sprite.getOriginY(),

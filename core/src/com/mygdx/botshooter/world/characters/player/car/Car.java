@@ -1,4 +1,4 @@
-package com.mygdx.botshooter.world.characters.car;
+package com.mygdx.botshooter.world.characters.player.car;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;

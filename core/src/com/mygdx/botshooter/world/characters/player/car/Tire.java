@@ -1,4 +1,4 @@
-package com.mygdx.botshooter.world.characters.car;
+package com.mygdx.botshooter.world.characters.player.car;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -110,8 +110,8 @@ public class Tire {
     public void update(ControlAction action) {
         Vector2 forwardNormal = body.getWorldVector(new Vector2(0, 1)).cpy();
         currentSpeed = getForwardVelocity().dot(forwardNormal);
-        if(action == ControlAction.DRIVE_FORWARD) driveForward(forwardNormal);
-        else if(action == ControlAction.DRIVE_BACKWARD) driveBackward(forwardNormal);
+        if(action == ControlAction.UP) driveForward(forwardNormal);
+        else if(action == ControlAction.DOWN) driveBackward(forwardNormal);
     }
 
     public void turn(float angle) {

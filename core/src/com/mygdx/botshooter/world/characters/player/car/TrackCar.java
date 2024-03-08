@@ -1,4 +1,4 @@
-package com.mygdx.botshooter.world.characters.car;
+package com.mygdx.botshooter.world.characters.player.car;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -85,6 +85,14 @@ public class TrackCar extends Car {
 
     }
 
+    @Override
+    public void update() {
+        super.update();
+        Debug.log("Player Position: (", body.getPosition().x + " , " + body.getPosition().y + ")");
+        Debug.log("Player Velocity: ", body.getLinearVelocity().len());
+        updateFriction();
+
+    }
 
     @Override
     public void updateDrive(Array<ControlAction> actions, float delta) {
@@ -95,33 +103,33 @@ public class TrackCar extends Car {
         ControlAction leftAction = ControlAction.DO_NOTHING;
         for (ControlAction action : actions) {
             switch (action) {
-                case DRIVE_FORWARD:
+                case UP:
                     right++;
                     left++;
                     break;
-                case DRIVE_BACKWARD:
+                case DOWN:
                     right--;
                     left--;
                     break;
-                case TURN_LEFT:
+                case LEFT:
                     right++;
                     left--;
                     break;
-                case TURN_RIGHT:
+                case RIGHT:
                     right--;
                     left++;
                     break;
-                case DRILL:
+                case SPACE:
                     isDrilling = true;
                     break;
             }
         }
 
-        if (right > 0) rightAction = ControlAction.DRIVE_FORWARD;
-        else if (right < 0) rightAction = ControlAction.DRIVE_BACKWARD;
+        if (right > 0) rightAction = ControlAction.UP;
+        else if (right < 0) rightAction = ControlAction.DOWN;
 
-        if (left > 0) leftAction = ControlAction.DRIVE_FORWARD;
-        else if (left < 0) leftAction = ControlAction.DRIVE_BACKWARD;
+        if (left > 0) leftAction = ControlAction.UP;
+        else if (left < 0) leftAction = ControlAction.DOWN;
 
         tires[1].update(rightAction);
         tires[0].update(leftAction);
@@ -133,10 +141,6 @@ public class TrackCar extends Car {
             drill.setDrilling(false);
         }
         drill.update(delta);
-        updateFriction();
-        update();
-        Debug.log("Player Position: (", body.getPosition().x + " , " + body.getPosition().y + ")");
-        Debug.log("Player Velocity: ", body.getLinearVelocity().len());
     }
 
     public float getRightTrackSpeed() {
